@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações 💖</title>
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='config.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <main class="config-wrapper">
+
+    <aside class="sidebar">
+      <div class="logo-area">
+        <div class="logo-heart">♡</div>
+        <h2>Nosso Mundo</h2>
+        <p>só nosso</p>
+      </div>
+
+      <nav>
+        <a href="/home">🏠 Início</a>
+        <a href="/album">🖼️ Álbum de Fotos</a>
+        <a class="active" href="/config">⚙️ Configurações</a>
+      </nav>
+
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </aside>
+
+    <section class="config-content">
+
+      <header class="config-header">
+        <div>
+          <h1>Configurações</h1>
+          <p>Escolha o fundo que mais combina com a nossa história.</p>
+        </div>
+      </header>
+
+      <section class="background-grid">
+
+        <div class="background-card" onclick="selectBackground('fundo1.jpeg', this)">
+          <img src="{{ url_for('static', filename='fundo1.jpeg') }}" alt="Fundo 1">
+          <span>Romântico</span>
+        </div>
+
+        <div class="background-card" onclick="selectBackground('praia.png', this)">
+          <img src="{{ url_for('static', filename='praia.png') }}" alt="Fundo 2">
+          <span>Praia</span>
+        </div>
+
+        <div class="background-card" onclick="selectBackground('noite_estrelada.png', this)">
+          <img src="{{ url_for('static', filename='noite_estrelada.png') }}" alt="Fundo 3">
+          <span>Noite estrelada</span>
+        </div>
+
+        <div class="background-card" onclick="selectBackground('paris.png', this)">
+          <img src="{{ url_for('static', filename='paris.png') }}" alt="Fundo 4">
+          <span>Paris</span>
+        </div>
+
+      </section>
+
+      <div class="preview-box">
+        <h2>Prévia do fundo</h2>
+        <p>Esse será o clima visual do nosso mundo.</p>
+      </div>
+
+      <button class="save-config-btn" onclick="saveBackground()">
+        Salvar fundo 💖
+      </button>
+
+    </section>
+
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script src="{{ url_for('static', filename='firebase.js') }}"></script>
+  <script src="{{ url_for('static', filename='config.js') }}"></script>
+
+</body>
+</html>

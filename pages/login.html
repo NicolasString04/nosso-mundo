@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Entrar 💖</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="login-container">
+
+  <h1>Bem-vinda 💖</h1>
+  <p class="subtitle">Entre para continuar nossa história</p>
+
+  <div class="login-box">
+    <input type="email" placeholder="Seu email">
+    <input type="password" placeholder="Sua senha">
+
+    <button class="btn-enter" onclick="login()">Entrar 💖</button>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script src="{{ url_for('static', filename='firebase.js') }}"></script>
+
+<script src="{{ url_for('static', filename='auth.js') }}"></script>
+
+</body>
+</html>

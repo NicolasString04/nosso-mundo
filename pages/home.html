@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Nosso Mundo 💖</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="hearts-container"></div>
+
+  <main class="home-wrapper">
+
+    <aside class="sidebar">
+      <div class="logo-area">
+        <div class="logo-heart">♡</div>
+        <h2>Nosso Mundo</h2>
+        <p>só nosso</p>
+      </div>
+
+      <nav>
+  <a class="active" href="/home">🏠 Início</a>
+  <a href="/album">🖼️ Álbum de Fotos</a>
+  <a href="/config">⚙️ Configurações</a>
+</nav>
+
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </aside>
+
+    <section class="content">
+
+      <header class="top-section">
+        <div class="profile-photo">
+          <img src="{{ url_for('static', filename='love.jpeg') }}" alt="Nós">
+        </div>
+
+        <div>
+          <h1>Nosso tempo juntos ♡</h1>
+          <p>Cada segundo ao seu lado vale a pena.</p>
+        </div>
+
+        <button class="add-btn" onclick="openMemoryModal()">
+  ＋ Adicionar nova página
+</button>
+      </header>
+
+      <section class="counter-card">
+        <div><span id="dias">0</span><p>Dias</p></div>
+        <div><span id="horas">0</span><p>Horas</p></div>
+        <div><span id="minutos">0</span><p>Minutos</p></div>
+        <div><span id="segundos">0</span><p>Segundos</p></div>
+      </section>
+
+      <section class="main-grid">
+
+        <div class="album-card">
+          <div class="section-title">
+            <h2>Nosso Álbum</h2>
+            <p>Cada página, uma lembrança.</p>
+          </div>
+
+          <div class="book">
+  <button class="page-btn left" onclick="prevPage()">‹</button>
+
+  <div class="book-cover">
+    <div class="book-page" id="bookPage">
+
+     <div class="page-left">
+  <img id="mainPhoto" class="main-book-photo" src="" onclick="openPhotoModal(this.src)">
+
+  <div class="mini-photos">
+    <img id="subPhoto1" src="" onclick="openPhotoModal(this.src)">
+    <img id="subPhoto2" src="" onclick="openPhotoModal(this.src)">
+    <img id="subPhoto3" src="" onclick="openPhotoModal(this.src)">
+  </div>
+        </div>
+
+  <div class="book-spine"></div>
+      <div class="page-right">
+        <h3 id="memoryDate">Carregando...</h3>
+
+        <div class="divider">
+          <span></span>
+          <p>❤</p>
+          <span></span>
+        </div>
+
+        <p id="memoryText">Buscando memórias...</p>
+
+       <div class="memory-song" id="memorySongBox">
+  <p class="song-title">🎧 Música do dia</p>
+
+  <iframe
+    id="memoryMusicPlayer"
+    style="border-radius:12px"
+    width="100%"
+    height="80"
+    frameborder="0"
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy">
+  </iframe>
+
+  <p id="noMusicText" class="no-music">Nenhuma música adicionada nesse dia.</p>
+</div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <button class="page-btn right" onclick="nextPage()">›</button>
+</div>
+
+          <div class="dots" id="dots"></div>
+        </div>
+
+        <aside class="spotify-card">
+          <h2>Nossa Playlist ♡</h2>
+          <p>As músicas que contam nossa história.</p>
+
+          <div class="spotify-box">
+            <iframe
+              style="border-radius:12px"
+              src="https://open.spotify.com/embed/playlist/5lUEqmbXkxRgynW7ONmJVG"
+              width="100%"
+              height="152"
+              frameborder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy">
+            </iframe>
+          </div>
+
+          <button class="spotify-btn">Abrir no Spotify</button>
+        </aside>
+
+      </section>
+
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" id="memoryModal">
+  <div class="memory-modal">
+    <button class="close-modal" onclick="closeMemoryModal()">×</button>
+
+    <h2>Nova memória 💖</h2>
+    <p>Adicione mais uma página aos nossos contos de amor.</p>
+
+    <input type="text" id="newDate" placeholder="Data da memória">
+
+    <textarea id="newText" placeholder="Descrição desse dia"></textarea>
+
+    <input type="text" id="newMusic" placeholder="Cole o link da música do Spotify 🎧">
+
+    <label>Foto principal</label>
+<input type="file" id="newMainPhoto" accept="image/*">
+
+<label>Subfoto 1</label>
+<input type="file" id="newSubPhoto1" accept="image/*">
+
+<label>Subfoto 2</label>
+<input type="file" id="newSubPhoto2" accept="image/*">
+
+<label>Subfoto 3</label>
+<input type="file" id="newSubPhoto3" accept="image/*">
+
+
+    <button class="save-memory-btn" onclick="saveMemory()">Salvar memória 💖</button>
+  </div>
+</div>
+  <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+  <button class="close-photo" onclick="closePhotoModal()">×</button>
+  <img id="expandedPhoto" src="">
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+<script src="{{ url_for('static', filename='firebase.js') }}"></script>
+<script src="{{ url_for('static', filename='home.js') }}"></script>
+
+</body>
+</html>

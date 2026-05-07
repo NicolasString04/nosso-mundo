@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nossa História 💖</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- 💖 Fundo com corações -->
+  <div class="hearts-container"></div>
+
+  <!-- 🌹 Conteúdo principal -->
+  <div class="container">
+
+    <!-- 📸 Foto do casal -->
+    <div class="photo">
+  <img src="{{ url_for('static', filename='love.jpeg') }}">
+  <div class="heart-center">❤️</div>
+</div>
+
+    <!-- 💌 Texto -->
+    <h1>Contos de amor</h1>
+    <p class="subtitle">Cada momento ao seu lado vale a pena 💖</p>
+
+      <div class="together">
+  <span class="line"></span>
+  <p>JUNTOS DESDE</p>
+  <span class="line"></span>
+</div>
+
+<h2 class="date">20 de Março de 2026</h2>
+
+    <!-- ⏳ Contador -->
+    <div class="contador">
+      <div><span id="dias">0</span><p>Dias</p></div>
+      <div><span id="horas">0</span><p>Horas</p></div>
+      <div><span id="minutos">0</span><p>Min</p></div>
+      <div><span id="segundos">0</span><p>Seg</p></div>
+    </div>
+
+    <!-- 🎧 Botão música -->
+    <button class="btn-music">🎧 Começar nossa história</button>
+
+    <!-- 🚀 Botão entrar -->
+    <button class="btn-enter" onclick="window.location.href='/login'">
+      Entrar na nossa história 💖
+    </button>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+
+<div class="spotify-player" id="spotifyPlayer">
+  <iframe
+    src="https://open.spotify.com/embed/track/0bOqCHcUOMEDoDqYUL0PLW"
+    width="300"
+    height="80"
+    frameborder="0"
+    allowtransparency="true"
+    allow="encrypted-media">
+  </iframe>
+</div>
+</body>
+</html>

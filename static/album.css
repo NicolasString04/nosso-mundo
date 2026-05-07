@@ -1,0 +1,352 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+
+  background:
+    linear-gradient(rgba(8, 8, 20, 0.78), rgba(8, 8, 20, 0.96)),
+    url("/static/fundo1.jpeg");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.album-wrapper {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  padding: 18px;
+  gap: 18px;
+}
+
+.sidebar {
+  width: 230px;
+  padding: 22px 16px;
+  border-radius: 22px;
+
+  background: rgba(15, 12, 35, 0.65);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 120, 160, 0.25);
+  box-shadow: 0 0 35px rgba(255, 77, 109, 0.15);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo-area {
+  text-align: center;
+}
+
+.logo-heart {
+  font-size: 42px;
+  color: #ff6f91;
+  text-shadow: 0 0 18px #ff4d6d;
+}
+
+.logo-area h2 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 34px;
+  margin: 0;
+}
+
+.logo-area p {
+  margin-top: -4px;
+  opacity: 0.75;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar nav a {
+  padding: 13px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: 0.3s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: linear-gradient(45deg, #c13584, #ff4d6d);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.45);
+  opacity: 1;
+}
+
+.logout-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  background: rgba(255,255,255,0.1);
+}
+
+.album-content {
+  flex: 1;
+  padding: 28px;
+  border-radius: 24px;
+
+  background: rgba(15, 12, 35, 0.48);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 120, 160, 0.2);
+  overflow-y: auto;
+}
+
+.album-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.album-header h1 {
+  margin: 0;
+  font-family: 'Great Vibes', cursive;
+  font-size: 56px;
+  font-weight: 400;
+  text-shadow: 0 0 18px rgba(255, 77, 109, 0.55);
+}
+
+.album-header p {
+  margin: 4px 0 0;
+  opacity: 0.8;
+}
+
+.back-btn {
+  padding: 13px 18px;
+  border-radius: 16px;
+  color: white;
+  text-decoration: none;
+
+  background: linear-gradient(45deg, #ff4d6d, #ff8fab);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.45);
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.memory-card {
+  overflow: hidden;
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 120, 160, 0.25);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.28);
+
+  transition: 0.3s;
+}
+
+.memory-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 45px rgba(255, 77, 109, 0.22);
+}
+
+.memory-photo {
+  height: 190px;
+  background: linear-gradient(135deg, #ff8fab, #8e44ad);
+}
+
+.memory-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.memory-info {
+  padding: 18px;
+}
+
+.memory-info h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #ffb3c6;
+}
+
+.memory-info p {
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.88;
+}
+
+.music-chip {
+  display: inline-block;
+  margin: 6px 0 14px;
+  padding: 7px 10px;
+
+  border-radius: 999px;
+  font-size: 12px;
+
+  background: rgba(29, 185, 84, 0.18);
+  color: #b7ffd1;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.card-actions button {
+  flex: 1;
+  padding: 10px;
+
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+
+  color: white;
+  background: rgba(255,255,255,0.12);
+  transition: 0.25s;
+}
+
+.card-actions button:hover {
+  background: #ff4d6d;
+}
+
+.edit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(5, 5, 15, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.edit-modal-overlay.show {
+  display: flex;
+}
+
+.edit-modal {
+  width: 430px;
+  max-width: 90%;
+  padding: 28px;
+  border-radius: 22px;
+
+  position: relative;
+  text-align: center;
+
+  background: rgba(20, 14, 42, 0.95);
+  border: 1px solid rgba(255, 120, 160, 0.35);
+  box-shadow: 0 0 35px rgba(255, 77, 109, 0.35);
+}
+
+.edit-modal h2 {
+  margin: 0 0 18px;
+  font-family: 'Great Vibes', cursive;
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.edit-modal input,
+.edit-modal textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px;
+
+  border: none;
+  border-radius: 12px;
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.edit-modal textarea {
+  height: 100px;
+  resize: none;
+}
+
+.close-edit {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.save-edit-btn {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+
+  color: white;
+  background: linear-gradient(45deg, #ff4d6d, #ff8fab);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.55);
+}
+
+.save-edit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .album-wrapper,
+  .config-wrapper {
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .album-content,
+  .config-content {
+    padding: 16px;
+  }
+
+  .album-header,
+  .config-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .album-header h1,
+  .config-header h1 {
+    font-size: 42px;
+  }
+
+  .memory-grid,
+  .background-grid {
+    grid-template-columns: 1fr;
+  }
+}

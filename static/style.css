@@ -1,0 +1,246 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    linear-gradient(rgba(10,10,20,0.5), rgba(10,10,20,0.9)),
+    url("/static/fundo1.jpeg");
+
+  background-size: cover;
+  background-position: center;
+
+  color: white;
+  overflow: hidden;
+}
+
+/* Container */
+.container {
+  text-align: center;
+  z-index: 2;
+}
+
+/* Foto */
+.photo {
+  position: relative;
+  display: inline-block;
+}
+
+.photo img {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 3px solid #ff4d6d;
+  object-fit: cover;
+
+  box-shadow: 0 0 30px rgba(255, 77, 109, 0.7);
+}
+
+.heart-center {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-size: 26px;
+
+  animation: pulseHeart 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseHeart {
+  0% {
+    transform: translateX(-50%) scale(1);
+    text-shadow: 0 0 5px #ff4d6d;
+  }
+
+  50% {
+    transform: translateX(-50%) scale(1.4);
+    text-shadow: 0 0 20px #ff4d6d, 0 0 40px #ff758f;
+  }
+
+  100% {
+    transform: translateX(-50%) scale(1);
+    text-shadow: 0 0 5px #ff4d6d;
+  }
+}
+
+
+/* Texto */
+h1 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 48px;
+  margin-top: 20px;
+
+  color: #fff;
+
+  text-shadow:
+    0 0 10px rgba(255, 100, 150, 0.8),
+    0 0 20px rgba(255, 100, 150, 0.6);
+}
+
+.subtitle {
+  opacity: 0.8;
+  margin-bottom: 30px;
+}
+
+/* Contador */
+.contador {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.contador div {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 12px 18px;
+
+  box-shadow: 0 0 10px rgba(255, 77, 109, 0.2);
+}
+
+.contador span {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Botões */
+button {
+  border: none;
+  padding: 12px 20px;
+  margin: 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-music {
+  background: #6c5ce7;
+  color: white;
+}
+
+.btn-enter {
+  background: linear-gradient(45deg, #ff4d6d, #ff758f);
+  box-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
+  transition: 0.3s;
+}
+
+.btn-enter:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 77, 109, 0.9);
+}
+
+/* Corações */
+.heart {
+  position: fixed;
+  top: -10px;
+  color: pink;
+  font-size: 20px;
+  animation: fall linear forwards;
+  opacity: 0.8;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.together {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.together p {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #ff9ab0;
+}
+
+.line {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ff4d6d, transparent);
+}
+
+.date {
+  font-family: 'Great Vibes', cursive;
+  font-size: 38px;
+  margin-bottom: 20px;
+
+  text-shadow: 0 0 15px rgba(255, 120, 150, 0.8);
+}
+
+.sparkle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: pink;
+  border-radius: 50%;
+
+  box-shadow: 0 0 8px pink, 0 0 15px #ff4d6d;
+
+  animation: sparkleAnim ease-out forwards;
+}
+
+@keyframes sparkleAnim {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+.container {
+  text-align: center;
+  z-index: 2;
+
+  animation: fadeIn 1.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spotify-player {
+  position: fixed;
+  bottom: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  transition: 0.5s;
+
+  z-index: 10;
+}
+
+.spotify-player.show {
+  bottom: 20px;
+}

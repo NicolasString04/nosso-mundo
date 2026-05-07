@@ -1,0 +1,268 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+
+  background:
+    linear-gradient(rgba(8, 8, 20, 0.78), rgba(8, 8, 20, 0.96)),
+    url("/static/fundo1.jpeg");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.config-wrapper {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  padding: 18px;
+  gap: 18px;
+}
+
+.sidebar {
+  width: 230px;
+  padding: 22px 16px;
+  border-radius: 22px;
+
+  background: rgba(15, 12, 35, 0.65);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 120, 160, 0.25);
+  box-shadow: 0 0 35px rgba(255, 77, 109, 0.15);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo-area {
+  text-align: center;
+}
+
+.logo-heart {
+  font-size: 42px;
+  color: #ff6f91;
+  text-shadow: 0 0 18px #ff4d6d;
+}
+
+.logo-area h2 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 34px;
+  margin: 0;
+}
+
+.logo-area p {
+  margin-top: -4px;
+  opacity: 0.75;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar nav a {
+  padding: 13px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: 0.3s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: linear-gradient(45deg, #c13584, #ff4d6d);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.45);
+  opacity: 1;
+}
+
+.logout-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  background: rgba(255,255,255,0.1);
+}
+
+.config-content {
+  flex: 1;
+  padding: 32px;
+  border-radius: 24px;
+
+  background: rgba(15, 12, 35, 0.48);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 120, 160, 0.2);
+  overflow-y: auto;
+}
+
+.config-header h1 {
+  margin: 0;
+  font-family: 'Great Vibes', cursive;
+  font-size: 58px;
+  font-weight: 400;
+  text-shadow: 0 0 18px rgba(255, 77, 109, 0.55);
+}
+
+.config-header p {
+  margin-top: 6px;
+  opacity: 0.82;
+}
+
+.background-grid {
+  margin-top: 30px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+}
+
+.background-card {
+  position: relative;
+  height: 160px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+
+  border: 2px solid transparent;
+  box-shadow: 0 18px 36px rgba(0,0,0,0.28);
+
+  transition: 0.3s;
+}
+
+.background-card:hover {
+  transform: translateY(-5px);
+}
+
+.background-card.selected {
+  border-color: #ff6f91;
+  box-shadow:
+    0 0 20px rgba(255, 77, 109, 0.65),
+    0 18px 36px rgba(0,0,0,0.28);
+}
+
+.background-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.background-card span {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.preview-box {
+  margin-top: 30px;
+  padding: 28px;
+  min-height: 190px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(rgba(8, 8, 20, 0.45), rgba(8, 8, 20, 0.8)),
+    url("/static/fundo1.jpeg");
+
+  background-size: cover;
+  background-position: center;
+
+  border: 1px solid rgba(255, 120, 160, 0.25);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.28);
+}
+
+.preview-box h2 {
+  margin: 0;
+  font-family: 'Great Vibes', cursive;
+  font-size: 44px;
+  font-weight: 400;
+}
+
+.preview-box p {
+  opacity: 0.82;
+}
+
+.save-config-btn {
+  margin-top: 24px;
+  padding: 14px 22px;
+
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+
+  background: linear-gradient(45deg, #ff4d6d, #ff8fab);
+  box-shadow: 0 0 20px rgba(255, 77, 109, 0.45);
+
+  transition: 0.3s;
+}
+
+.save-config-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 28px rgba(255, 77, 109, 0.75);
+}
+
+@media (max-width: 900px) {
+  .album-wrapper,
+  .config-wrapper {
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .album-content,
+  .config-content {
+    padding: 16px;
+  }
+
+  .album-header,
+  .config-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .album-header h1,
+  .config-header h1 {
+    font-size: 42px;
+  }
+
+  .memory-grid,
+  .background-grid {
+    grid-template-columns: 1fr;
+  }
+}

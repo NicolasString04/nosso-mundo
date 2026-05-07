@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Álbum de Fotos 💖</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='album.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <main class="album-wrapper">
+
+    <aside class="sidebar">
+      <div class="logo-area">
+        <div class="logo-heart">♡</div>
+        <h2>Nosso Mundo</h2>
+        <p>só nosso</p>
+      </div>
+
+      <nav>
+        <a href="/home">🏠 Início</a>
+        <a class="active" href="/album">🖼️ Álbum de Fotos</a>
+        <a href="/config">⚙️ Configurações</a>
+      </nav>
+
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </aside>
+
+    <section class="album-content">
+
+      <header class="album-header">
+        <div>
+          <h1>Álbum de Fotos</h1>
+          <p>Todas as nossas memórias reunidas em um só lugar.</p>
+        </div>
+
+        <a class="back-btn" href="/home">Voltar ao livro 💖</a>
+      </header>
+
+      <section class="memory-grid" id="memoryGrid">
+        <!-- Cards entram pelo JS -->
+      </section>
+
+    </section>
+
+  </main>
+
+  <div class="edit-modal-overlay" id="editModal">
+  <div class="edit-modal">
+    <button class="close-edit" onclick="closeEditModal()">×</button>
+
+    <h2>Editar memória 💖</h2>
+
+    <input type="text" id="editDate" placeholder="Data da memória">
+
+    <textarea id="editText" placeholder="Descrição"></textarea>
+
+    <input type="text" id="editMusic" placeholder="Link da música do Spotify">
+
+<label>Trocar foto principal</label>
+<input type="file" id="editMainPhoto" accept="image/*">
+
+<label>Trocar subfoto 1</label>
+<input type="file" id="editSubPhoto1" accept="image/*">
+
+<label>Trocar subfoto 2</label>
+<input type="file" id="editSubPhoto2" accept="image/*">
+
+<label>Trocar subfoto 3</label>
+<input type="file" id="editSubPhoto3" accept="image/*">
+
+<button class="save-edit-btn" onclick="saveEdit()">
+  Salvar alterações
+</button>
+
+  </div>
+</div>
+
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+<script src="{{ url_for('static', filename='firebase.js') }}"></script>
+<script src="{{ url_for('static', filename='album.js') }}"></script>
+
+</body>
+</html>
+</html>
