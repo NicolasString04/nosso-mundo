@@ -5,7 +5,7 @@
 
 O **Nosso Mundo** é um sistema romântico interativo desenvolvido com o objetivo de criar uma experiência emocional, moderna e totalmente personalizada. A aplicação funciona como um álbum digital exclusivo para guardar, organizar e eternizar memórias especiais através de fotos, músicas e relatos, proporcionando uma imersão única e nostálgica.
 
-O sistema tem como objetivo até o presente momento somente guardar fotos minhas e da minha namorada, porém, em conversas e discussões sobre o sistema, foi verificado que o mesmo tem potencial para possíveis atualizações e em breve serão lançadas novas funcionalidades.
+O sistema tem como objetivo até o presente momento guardar fotos e momentos meus e da minha namorada, porém, em conversas e discussões sobre o sistema, foi verificado que o mesmo tem potencial para possíveis atualizações e em breve serão lançadas novas funcionalidades.
 
 ---
 
