@@ -41,8 +41,6 @@ Criar um espaço digital bonito, acolhedor e interativo para registrar momentos 
 * 🎨 **Personalização visual:** seleção de diferentes cenários e fundos para a aplicação.
 * 📱 **Design responsivo:** interface adaptada para diferentes tamanhos de tela.
 
-> Atualmente, as páginas da aplicação podem ser acessadas diretamente. A restrição completa das áreas internas por autenticação está prevista para uma atualização futura.
-
 ---
 
 ## 🛠️ Tecnologias utilizadas
