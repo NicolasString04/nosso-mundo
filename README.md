@@ -66,7 +66,7 @@ Criar um espaço digital bonito, acolhedor e interativo para registrar momentos 
   <img width="1416" alt="Página inicial do Nosso Mundo" src="https://github.com/user-attachments/assets/4b38d6e5-ce8d-4857-af58-04007d3e2420">
 </p>
 
-### Álbum de fotos
+### Autenticação
 
 <p align="center">
   <img width="1435" alt="Álbum de fotos e memórias" src="https://github.com/user-attachments/assets/7c327fd6-e437-4d46-a214-c01f74202094">
@@ -78,7 +78,7 @@ Criar um espaço digital bonito, acolhedor e interativo para registrar momentos 
   <img width="1598" alt="Tela de gerenciamento de memórias" src="https://github.com/user-attachments/assets/cf2c6d0f-8620-46ad-9675-b253d2c487ad">
 </p>
 
-### Autenticação
+### Álbum de fotos
 
 <p align="center">
   <img width="1439" alt="Tela de login e autenticação" src="https://github.com/user-attachments/assets/4102696e-626a-4799-a7fc-17a09a15c246">
@@ -88,7 +88,6 @@ Criar um espaço digital bonito, acolhedor e interativo para registrar momentos 
 
 ## 🔮 Melhorias futuras
 
-* Restrição das áreas internas para usuários autenticados.
 * Aprimoramento da experiência em dispositivos móveis.
 * Otimização das imagens e animações.
 * Novas opções de temas e personalização.
