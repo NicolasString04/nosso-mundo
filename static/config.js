@@ -76,6 +76,4 @@ function logout() {
   });
 }
 
-window.onload = function () {
-  loadSavedBackground();
-};
+loadSavedBackground();

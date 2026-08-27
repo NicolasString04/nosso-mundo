@@ -327,10 +327,9 @@ function applySavedBackground() {
 
 
 
-window.onload = function () {
-  applySavedBackground();
-  loadMemoriesFromFirebase();
-};
+applySavedBackground();
+loadMemoriesFromFirebase();
+
 
 function openPhotoModal(src) {
   const modal = document.getElementById("photoModal");

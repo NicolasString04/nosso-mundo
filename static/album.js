@@ -242,7 +242,5 @@ function applySavedBackground() {
     });
 }
 
-window.onload = function () {
-  applySavedBackground();
-  loadAlbumCards();
-};
+applySavedBackground();
+loadAlbumCards();
