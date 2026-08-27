@@ -6,6 +6,10 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <script>
+  document.documentElement.style.visibility = "hidden";
+</script>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -185,7 +189,11 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
 <script src="{{ url_for('static', filename='firebase.js') }}"></script>
-<script src="{{ url_for('static', filename='home.js') }}"></script>
+
+<script
+  src="{{ url_for('static', filename='auth-guard.js') }}"
+  data-page-script="{{ url_for('static', filename='home.js') }}">
+</script>
 
 </body>
 </html>

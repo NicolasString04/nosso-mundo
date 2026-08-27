@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  document.documentElement.style.visibility = "hidden";
+</script>
+
   <title>Configurações 💖</title>
 
 
@@ -81,7 +85,10 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script src="{{ url_for('static', filename='firebase.js') }}"></script>
-  <script src="{{ url_for('static', filename='config.js') }}"></script>
+  <script
+  src="{{ url_for('static', filename='auth-guard.js') }}"
+  data-page-script="{{ url_for('static', filename='config.js') }}">
+</script>
 
 </body>
 </html>
