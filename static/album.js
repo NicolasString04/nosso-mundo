@@ -1,8 +1,16 @@
 const grid = document.getElementById("memoryGrid");
 
 let editingId = null;
-let currentMain = "";
-let currentSubs = [];
+let currentMain = emptyMedia();
+let currentSubs = createEmptySubs();
+
+function emptyMedia() {
+  return { url: "", type: "" };
+}
+
+function createEmptySubs() {
+  return [emptyMedia(), emptyMedia(), emptyMedia()];
+}
 
 function logout() {
   auth.signOut().then(() => {
@@ -28,199 +36,495 @@ function convertSpotifyLink(link) {
   return cleanLink;
 }
 
-async function uploadImage(file, folder) {
+function detectMediaType(file) {
+  if (!file) return "";
+
+  if (file.type?.startsWith("image/")) return "image";
+  if (file.type?.startsWith("video/")) return "video";
+
+  const extension = file.name.split(".").pop().toLowerCase();
+  const videoExtensions = ["mp4", "webm", "mov", "m4v", "ogv"];
+  const imageExtensions = [
+    "jpg",
+    "jpeg",
+    "png",
+    "webp",
+    "gif",
+    "heic",
+    "heif"
+  ];
+
+  if (videoExtensions.includes(extension)) return "video";
+  if (imageExtensions.includes(extension)) return "image";
+
+  return "";
+}
+
+function inferMediaType(url) {
+  if (!url) return "";
+
+  let decodedURL = String(url).toLowerCase();
+
+  try {
+    decodedURL = decodeURIComponent(decodedURL);
+  } catch {
+    // Mantém a URL original caso ela não possa ser decodificada.
+  }
+
+  return /\.(mp4|webm|mov|m4v|ogv)(?:\?|$)/i.test(decodedURL)
+    ? "video"
+    : "image";
+}
+
+function normalizeStoredType(type, url) {
+  if (!url) return "";
+  if (type === "video" || type === "image") return type;
+
+  return inferMediaType(url);
+}
+
+function isLegacySubPlaceholder(url) {
+  if (!url) return false;
+
+  return /(?:^|\/)static\/love\.jpeg(?:\?|$)/i.test(String(url));
+}
+
+function sanitizeFileName(fileName) {
+  return String(fileName || "arquivo")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
+async function uploadMedia(file, folder) {
   if (!file) return null;
 
-  const fileName = `${Date.now()}_${file.name}`;
+  const mediaType = detectMediaType(file);
+
+  if (!mediaType) {
+    throw new Error(`Formato não suportado: ${file.name}`);
+  }
+
+  const safeName = sanitizeFileName(file.name);
+  const uniquePart = Math.random().toString(36).slice(2, 9);
+  const fileName = `${Date.now()}_${uniquePart}_${safeName}`;
   const fileRef = storage.ref().child(`${folder}/${fileName}`);
+  const metadata = file.type
+    ? { contentType: file.type }
+    : undefined;
 
-  await fileRef.put(file);
+  await fileRef.put(file, metadata);
 
-  return await fileRef.getDownloadURL();
+  return {
+    url: await fileRef.getDownloadURL(),
+    type: mediaType
+  };
+}
+
+function normalizeMemory(doc) {
+  const data = doc.data();
+  const mainURL = data.main || "";
+  const storedSubURLs = Array.isArray(data.subs)
+    ? data.subs
+    : [];
+  const storedSubTypes = Array.isArray(data.subTypes)
+    ? data.subTypes
+    : [];
+
+  const subs = createEmptySubs().map((_, index) => {
+    const originalURL = storedSubURLs[index] || "";
+    const url = isLegacySubPlaceholder(originalURL)
+      ? ""
+      : originalURL;
+
+    return {
+      url,
+      type: normalizeStoredType(storedSubTypes[index], url)
+    };
+  });
+
+  return {
+    id: doc.id,
+    date: data.date || "",
+    text: data.text || "",
+    music: data.music || "",
+    main: {
+      url: mainURL,
+      type: normalizeStoredType(data.mainType, mainURL)
+    },
+    subs
+  };
+}
+
+function getCardMedia(memory) {
+  if (memory.main.url) {
+    return memory.main;
+  }
+
+  return (
+    memory.subs.find((media) => media.url) ||
+    emptyMedia()
+  );
+}
+
+function createCardMedia(memory) {
+  const mediaWrapper = document.createElement("div");
+  mediaWrapper.className = "memory-photo";
+
+  const media = getCardMedia(memory);
+
+  if (!media.url) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "memory-no-media";
+    emptyState.textContent = "♡ Memória sem mídia";
+
+    mediaWrapper.appendChild(emptyState);
+    return mediaWrapper;
+  }
+
+  const mediaElement = document.createElement(
+    media.type === "video" ? "video" : "img"
+  );
+
+  mediaElement.src = media.url;
+
+  if (media.type === "video") {
+    mediaElement.controls = true;
+    mediaElement.preload = "metadata";
+    mediaElement.playsInline = true;
+  } else {
+    mediaElement.alt =
+      `Memória de ${memory.date || "um dia especial"}`;
+
+    mediaElement.loading = "lazy";
+  }
+
+  mediaWrapper.appendChild(mediaElement);
+
+  return mediaWrapper;
+}
+
+function createMemoryCard(memory) {
+  const card = document.createElement("article");
+  card.className = "memory-card";
+
+  card.appendChild(createCardMedia(memory));
+
+  const info = document.createElement("div");
+  info.className = "memory-info";
+
+  const title = document.createElement("h3");
+  title.textContent = memory.date || "Sem data";
+
+  const description = document.createElement("p");
+  description.textContent =
+    memory.text || "Sem descrição";
+
+  const musicChip = document.createElement("span");
+  musicChip.className = "music-chip";
+  musicChip.textContent = memory.music
+    ? "🎧 Música adicionada"
+    : "🎧 Sem música";
+
+  const actions = document.createElement("div");
+  actions.className = "card-actions";
+
+  const editButton = document.createElement("button");
+  editButton.type = "button";
+  editButton.textContent = "Editar";
+
+  editButton.addEventListener("click", () => {
+    openEditModal(memory);
+  });
+
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.textContent = "Excluir";
+
+  deleteButton.addEventListener("click", () => {
+    deleteMemory(memory.id);
+  });
+
+  actions.append(editButton, deleteButton);
+  info.append(
+    title,
+    description,
+    musicChip,
+    actions
+  );
+
+  card.appendChild(info);
+
+  return card;
+}
+
+function renderEmptyAlbum() {
+  const emptyState = document.createElement("div");
+
+  emptyState.className = "album-empty-state";
+  emptyState.textContent =
+    "Nenhuma memória cadastrada ainda 💖";
+
+  grid.appendChild(emptyState);
 }
 
 function loadAlbumCards() {
   db.collection("memories")
     .orderBy("createdAt", "asc")
-    .onSnapshot((snapshot) => {
-      grid.innerHTML = "";
+    .onSnapshot(
+      (snapshot) => {
+        grid.innerHTML = "";
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
+        if (snapshot.empty) {
+          renderEmptyAlbum();
+          return;
+        }
 
-        const main = data.main || "/static/love.jpeg";
-        const subs = data.subs || [
-          "/static/love.jpeg",
-          "/static/love.jpeg",
-          "/static/love.jpeg"
-        ];
+        snapshot.forEach((doc) => {
+          const memory = normalizeMemory(doc);
+          const card = createMemoryCard(memory);
 
-        const card = document.createElement("div");
-        card.classList.add("memory-card");
+          grid.appendChild(card);
+        });
+      },
 
-        card.innerHTML = `
-          <div class="memory-photo">
-            <img src="${main}" alt="Memória">
-          </div>
+      (error) => {
+        console.error(
+          "Erro ao carregar o álbum:",
+          error
+        );
 
-          <div class="memory-info">
-            <h3>${data.date || "Sem data"}</h3>
-            <p>${data.text || "Sem descrição"}</p>
+        grid.innerHTML = "";
 
-            <span class="music-chip">
-              ${data.music ? "🎧 Música adicionada" : "🎧 Sem música"}
-            </span>
+        const errorState =
+          document.createElement("div");
 
-            <div class="card-actions">
-              <button onclick="openEditModal(
-                '${doc.id}',
-                '${escapeText(data.date)}',
-                '${escapeText(data.text)}',
-                '${escapeText(data.music || "")}',
-                '${escapeText(main)}',
-                '${escapeText(JSON.stringify(subs))}'
-              )">
-                Editar
-              </button>
+        errorState.className =
+          "album-empty-state";
 
-              <button onclick="deleteMemory('${doc.id}')">
-                Excluir
-              </button>
-            </div>
-          </div>
-        `;
+        errorState.textContent =
+          "Não foi possível carregar as memórias.";
 
-        grid.appendChild(card);
-      });
-    });
+        grid.appendChild(errorState);
+      }
+    );
 }
 
-function escapeText(text) {
-  return String(text || "")
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, "&quot;")
-    .replace(/\n/g, "\\n");
+function renderCurrentMediaInfo() {
+  const info =
+    document.getElementById("currentMediaInfo");
+
+  if (!info) return;
+
+  const mainLabel = currentMain.url
+    ? `Principal: ${
+        currentMain.type === "video"
+          ? "vídeo"
+          : "foto"
+      }`
+    : "Sem mídia principal";
+
+  const subCount = currentSubs.filter(
+    (media) => media.url
+  ).length;
+
+  const subLabel =
+    `${subCount} mídia${
+      subCount === 1 ? "" : "s"
+    } complementar${
+      subCount === 1 ? "" : "es"
+    }`;
+
+  info.textContent =
+    `${mainLabel} • ${subLabel}`;
 }
 
-function openEditModal(id, date, text, music, main, subsString) {
-  editingId = id;
-  currentMain = main || "/static/love.jpeg";
+function openEditModal(memory) {
+  editingId = memory.id;
 
-  try {
-    currentSubs = JSON.parse(subsString.replace(/&quot;/g, '"'));
-  } catch {
-    currentSubs = [
-      "/static/love.jpeg",
-      "/static/love.jpeg",
-      "/static/love.jpeg"
-    ];
-  }
+  currentMain = {
+    ...memory.main
+  };
 
-  document.getElementById("editDate").value = date;
-  document.getElementById("editText").value = text;
-  document.getElementById("editMusic").value = music;
+  currentSubs = memory.subs.map((media) => ({
+    ...media
+  }));
+
+  document.getElementById("editDate").value =
+    memory.date;
+
+  document.getElementById("editText").value =
+    memory.text;
+
+  document.getElementById("editMusic").value =
+    memory.music;
 
   document.getElementById("editMainPhoto").value = "";
   document.getElementById("editSubPhoto1").value = "";
   document.getElementById("editSubPhoto2").value = "";
   document.getElementById("editSubPhoto3").value = "";
 
-  document.getElementById("editModal").classList.add("show");
+  renderCurrentMediaInfo();
+
+  document
+    .getElementById("editModal")
+    .classList.add("show");
 }
 
 function closeEditModal() {
   editingId = null;
-  currentMain = "";
-  currentSubs = [];
-  document.getElementById("editModal").classList.remove("show");
+  currentMain = emptyMedia();
+  currentSubs = createEmptySubs();
+
+  document
+    .getElementById("editModal")
+    .classList.remove("show");
 }
 
 async function saveEdit() {
-  const saveBtn = document.querySelector(".save-edit-btn");
-  saveBtn.disabled = true;
-  saveBtn.innerText = "Salvando... 💖";
+  if (!editingId) {
+    alert(
+      "Nenhuma memória foi selecionada para edição."
+    );
 
-  const date = document.getElementById("editDate").value;
-  const text = document.getElementById("editText").value;
-  let music = document.getElementById("editMusic").value;
+    return;
+  }
 
-  const newMainPhoto = document.getElementById("editMainPhoto").files[0];
-  const newSubPhoto1 = document.getElementById("editSubPhoto1").files[0];
-  const newSubPhoto2 = document.getElementById("editSubPhoto2").files[0];
-  const newSubPhoto3 = document.getElementById("editSubPhoto3").files[0];
+  const date = document
+    .getElementById("editDate")
+    .value
+    .trim();
 
-  if (!editingId) return;
+  const text = document
+    .getElementById("editText")
+    .value
+    .trim();
+
+  const music = convertSpotifyLink(
+    document
+      .getElementById("editMusic")
+      .value
+      .trim()
+  );
 
   if (!date || !text) {
     alert("Preenche data e descrição 💖");
     return;
   }
 
-  music = convertSpotifyLink(music);
+  const saveBtn =
+    document.querySelector(".save-edit-btn");
+
+  const newMainFile =
+    document.getElementById("editMainPhoto")
+      .files[0];
+
+  const newSubFiles = [
+    document.getElementById("editSubPhoto1")
+      .files[0],
+
+    document.getElementById("editSubPhoto2")
+      .files[0],
+
+    document.getElementById("editSubPhoto3")
+      .files[0]
+  ];
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Salvando... 💖";
 
   try {
-    let mainURL = currentMain;
-    let subURLs = [...currentSubs];
+    const mainMedia = newMainFile
+      ? await uploadMedia(
+          newMainFile,
+          "memories/main"
+        )
+      : { ...currentMain };
 
-    if (newMainPhoto) {
-      mainURL = await uploadImage(newMainPhoto, "memories/main");
+    const subMedia = currentSubs.map(
+      (media) => ({ ...media })
+    );
+
+    for (
+      let index = 0;
+      index < newSubFiles.length;
+      index += 1
+    ) {
+      if (newSubFiles[index]) {
+        subMedia[index] = await uploadMedia(
+          newSubFiles[index],
+          "memories/subs"
+        );
+      }
     }
 
-    if (newSubPhoto1) {
-      subURLs[0] = await uploadImage(newSubPhoto1, "memories/subs");
-    }
+    await db
+      .collection("memories")
+      .doc(editingId)
+      .update({
+        date,
+        text,
+        music: music || "",
 
-    if (newSubPhoto2) {
-      subURLs[1] = await uploadImage(newSubPhoto2, "memories/subs");
-    }
+        main: mainMedia.url || "",
 
-    if (newSubPhoto3) {
-      subURLs[2] = await uploadImage(newSubPhoto3, "memories/subs");
-    }
+        mainType: mainMedia.url
+          ? mainMedia.type
+          : "",
 
-    await db.collection("memories").doc(editingId).update({
-      date: date,
-      text: text,
-      music: music || "",
-      main: mainURL || "/static/love.jpeg",
-      subs: [
-        subURLs[0] || "/static/love.jpeg",
-        subURLs[1] || "/static/love.jpeg",
-        subURLs[2] || "/static/love.jpeg"
-      ],
-      updatedAt: new Date()
-    });
+        subs: subMedia.map(
+          (media) => media.url || ""
+        ),
+
+        subTypes: subMedia.map(
+          (media) =>
+            media.url ? media.type : ""
+        ),
+
+        updatedAt: new Date()
+      });
 
     alert("Memória atualizada 💖");
     closeEditModal();
-
-    } catch (error) {
+  } catch (error) {
     console.error("Erro ao editar:", error);
-    alert("Erro ao editar: " + error.message);
+
+    alert(
+      "Erro ao editar: " + error.message
+    );
   } finally {
     saveBtn.disabled = false;
-    saveBtn.innerText = "Salvar alterações";
+    saveBtn.textContent = "Salvar alterações";
   }
 }
 
 async function deleteMemory(id) {
-  const confirmDelete = confirm("Tem certeza que quer excluir essa memória?");
+  const confirmDelete = confirm(
+    "Tem certeza que quer excluir essa memória?"
+  );
 
   if (!confirmDelete) return;
 
   try {
-    await db.collection("memories").doc(id).delete();
-    alert("Memória excluída 💔");
+    await db
+      .collection("memories")
+      .doc(id)
+      .delete();
 
+    alert("Memória excluída 💔");
   } catch (error) {
     console.error("Erro ao excluir:", error);
-    alert("Erro ao excluir: " + error.message);
+
+    alert(
+      "Erro ao excluir: " + error.message
+    );
   }
 }
 
 function applySavedBackground() {
-  db.collection("settings").doc("visual").get()
+  db.collection("settings")
+    .doc("visual")
+    .get()
     .then((doc) => {
       if (!doc.exists) return;
 
@@ -229,16 +533,27 @@ function applySavedBackground() {
       if (!data.background) return;
 
       document.body.style.background = `
-        linear-gradient(rgba(8, 8, 20, 0.75), rgba(8, 8, 20, 0.95)),
+        linear-gradient(
+          rgba(8, 8, 20, 0.75),
+          rgba(8, 8, 20, 0.95)
+        ),
         url("/static/${data.background}")
       `;
 
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center";
-      document.body.style.backgroundAttachment = "fixed";
+      document.body.style.backgroundSize =
+        "cover";
+
+      document.body.style.backgroundPosition =
+        "center";
+
+      document.body.style.backgroundAttachment =
+        "fixed";
     })
     .catch((error) => {
-      console.error("Erro ao carregar fundo:", error);
+      console.error(
+        "Erro ao carregar fundo:",
+        error
+      );
     });
 }
 

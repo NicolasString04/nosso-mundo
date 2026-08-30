@@ -89,7 +89,7 @@ body {
   border-radius: 14px;
   cursor: pointer;
   color: white;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .album-content {
@@ -145,7 +145,7 @@ body {
 
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 120, 160, 0.25);
-  box-shadow: 0 18px 36px rgba(0,0,0,0.28);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
 
   transition: 0.3s;
 }
@@ -157,13 +157,47 @@ body {
 
 .memory-photo {
   height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   background: linear-gradient(135deg, #ff8fab, #8e44ad);
 }
 
-.memory-photo img {
+.memory-photo img,
+.memory-photo video {
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: cover;
+}
+
+.memory-photo video {
+  background: #080714;
+}
+
+.memory-no-media,
+.album-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.memory-no-media {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+.album-empty-state {
+  grid-column: 1 / -1;
+  min-height: 220px;
+  padding: 30px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 120, 160, 0.2);
 }
 
 .memory-info {
@@ -209,7 +243,7 @@ body {
   cursor: pointer;
 
   color: white;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   transition: 0.25s;
 }
 
@@ -226,6 +260,7 @@ body {
   justify-content: center;
   align-items: center;
 
+  padding: 20px;
   background: rgba(5, 5, 15, 0.78);
   backdrop-filter: blur(8px);
 }
@@ -237,6 +272,8 @@ body {
 .edit-modal {
   width: 430px;
   max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
   padding: 28px;
   border-radius: 22px;
 
@@ -249,10 +286,16 @@ body {
 }
 
 .edit-modal h2 {
-  margin: 0 0 18px;
+  margin: 0 0 10px;
   font-family: 'Great Vibes', cursive;
   font-size: 42px;
   font-weight: 400;
+}
+
+.current-media-info {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: #ffb3c6;
 }
 
 .edit-modal input,
@@ -271,7 +314,22 @@ body {
 
 .edit-modal textarea {
   height: 100px;
-  resize: none;
+  resize: vertical;
+}
+
+.edit-modal label {
+  display: block;
+  margin: 7px 0 6px;
+  text-align: left;
+  font-size: 13px;
+  opacity: 0.86;
+}
+
+.edit-help {
+  margin: 4px 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.72;
 }
 
 .close-edit {
@@ -348,5 +406,14 @@ body {
   .memory-grid,
   .background-grid {
     grid-template-columns: 1fr;
+  }
+
+  .edit-modal-overlay {
+    padding: 12px;
+  }
+
+  .edit-modal {
+    max-width: 100%;
+    padding: 24px 18px;
   }
 }

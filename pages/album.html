@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-  document.documentElement.style.visibility = "hidden";
-</script>
+
+  <script>
+    document.documentElement.style.visibility = "hidden";
+  </script>
 
   <title>Álbum de Fotos 💖</title>
 
@@ -45,7 +46,7 @@
       </header>
 
       <section class="memory-grid" id="memoryGrid">
-        <!-- Cards entram pelo JS -->
+        <!-- Cards entram pelo JavaScript -->
       </section>
 
     </section>
@@ -53,47 +54,52 @@
   </main>
 
   <div class="edit-modal-overlay" id="editModal">
-  <div class="edit-modal">
-    <button class="close-edit" onclick="closeEditModal()">×</button>
+    <div class="edit-modal">
+      <button class="close-edit" onclick="closeEditModal()">×</button>
 
-    <h2>Editar memória 💖</h2>
+      <h2>Editar memória 💖</h2>
 
-    <input type="text" id="editDate" placeholder="Data da memória">
+      <p class="current-media-info" id="currentMediaInfo"></p>
 
-    <textarea id="editText" placeholder="Descrição"></textarea>
+      <input type="text" id="editDate" placeholder="Data da memória">
 
-    <input type="text" id="editMusic" placeholder="Link da música do Spotify">
+      <textarea id="editText" placeholder="Descrição"></textarea>
 
-<label>Trocar foto principal</label>
-<input type="file" id="editMainPhoto" accept="image/*">
+      <input type="text" id="editMusic" placeholder="Link da música do Spotify">
 
-<label>Trocar subfoto 1</label>
-<input type="file" id="editSubPhoto1" accept="image/*">
+      <label>Trocar mídia principal — foto ou vídeo</label>
+      <input type="file" id="editMainPhoto" accept="image/*,video/*">
 
-<label>Trocar subfoto 2</label>
-<input type="file" id="editSubPhoto2" accept="image/*">
+      <label>Trocar mídia complementar 1 — foto ou vídeo</label>
+      <input type="file" id="editSubPhoto1" accept="image/*,video/*">
 
-<label>Trocar subfoto 3</label>
-<input type="file" id="editSubPhoto3" accept="image/*">
+      <label>Trocar mídia complementar 2 — foto ou vídeo</label>
+      <input type="file" id="editSubPhoto2" accept="image/*,video/*">
 
-<button class="save-edit-btn" onclick="saveEdit()">
-  Salvar alterações
-</button>
+      <label>Trocar mídia complementar 3 — foto ou vídeo</label>
+      <input type="file" id="editSubPhoto3" accept="image/*,video/*">
 
+      <p class="edit-help">
+        Os campos de mídia que ficarem vazios continuarão exatamente como estão.
+      </p>
+
+      <button class="save-edit-btn" onclick="saveEdit()">
+        Salvar alterações
+      </button>
+
+    </div>
   </div>
-</div>
-
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-<script src="{{ url_for('static', filename='firebase.js') }}"></script>
-<script
-  src="{{ url_for('static', filename='auth-guard.js') }}"
-  data-page-script="{{ url_for('static', filename='album.js') }}">
-</script>
+  <script src="{{ url_for('static', filename='firebase.js') }}"></script>
+  <script
+    src="{{ url_for('static', filename='auth-guard.js') }}"
+    data-page-script="{{ url_for('static', filename='album.js') }}">
+  </script>
 
 </body>
 </html>
