@@ -1087,3 +1087,10 @@ body.album-focus-open {
     height: min(45vh, 330px) !important;
   }
 }
+
+/* CALENDÁRIO DA NOVA MEMÓRIA */
+
+.memory-modal input[type="date"] {
+  color-scheme: dark;
+  cursor: pointer;
+}

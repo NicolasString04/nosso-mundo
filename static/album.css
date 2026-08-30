@@ -417,3 +417,18 @@ body {
     padding: 24px 18px;
   }
 }
+
+/* CALENDÁRIO DA EDIÇÃO */
+
+.edit-modal input[type="date"] {
+  color-scheme: dark;
+  cursor: pointer;
+}
+
+.current-date-info {
+  margin: -4px 0 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #ffb3c6;
+  opacity: 0.88;
+}
