@@ -821,3 +821,269 @@ body {
     font-size: 28px;
   }
 }
+
+/* =========================================================
+   BOTÃO E MODO TELA CHEIA DO ÁLBUM
+========================================================= */
+
+.section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.album-focus-btn {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  border: 1px solid rgba(255, 120, 160, 0.55);
+  border-radius: 13px;
+
+  color: white;
+  background: rgba(255, 77, 109, 0.14);
+
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.album-focus-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 77, 109, 0.32);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.42);
+}
+
+.album-focus-icon {
+  font-size: 19px;
+  line-height: 1;
+}
+
+body.album-focus-open {
+  overflow: hidden;
+}
+
+.album-card::backdrop {
+  background: #080714;
+}
+
+.album-card:fullscreen,
+.album-card.album-focus-fallback {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: clamp(18px, 3vw, 34px);
+
+  display: flex;
+  flex-direction: column;
+
+  border: none;
+  border-radius: 0;
+
+  overflow: auto;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(106, 32, 65, 0.38),
+      transparent 42%
+    ),
+    linear-gradient(
+      145deg,
+      #171027,
+      #090718 70%
+    );
+}
+
+.album-card.album-focus-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.album-card:fullscreen .section-title,
+.album-card.album-focus-fallback .section-title {
+  width: min(1240px, 100%);
+  margin: 0 auto 12px;
+}
+
+.album-card:fullscreen .album-focus-btn,
+.album-card.album-focus-fallback .album-focus-btn {
+  background: rgba(255, 77, 109, 0.28);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.28);
+}
+
+.album-card:fullscreen .album-focus-icon,
+.album-card.album-focus-fallback .album-focus-icon {
+  font-size: 25px;
+}
+
+.album-card:fullscreen .book,
+.album-card.album-focus-fallback .book {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+
+  padding: 10px clamp(56px, 7vw, 110px);
+}
+
+.album-card:fullscreen .book-cover,
+.album-card.album-focus-fallback .book-cover {
+  width: min(1180px, calc(100vw - 180px));
+  max-width: none;
+}
+
+.album-card:fullscreen .book-page,
+.album-card.album-focus-fallback .book-page {
+  height: min(68vh, 620px);
+  min-height: 430px;
+
+  padding: clamp(26px, 3vw, 42px);
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    20px
+    minmax(0, 1fr);
+}
+
+.album-card:fullscreen .main-book-photo,
+.album-card.album-focus-fallback .main-book-photo {
+  height: clamp(230px, 37vh, 360px) !important;
+}
+
+.album-card:fullscreen .mini-photos img,
+.album-card:fullscreen .mini-photos video,
+.album-card.album-focus-fallback .mini-photos img,
+.album-card.album-focus-fallback .mini-photos video {
+  height: clamp(80px, 11vh, 115px) !important;
+}
+
+/*
+ * Quando a página possui somente uma mídia,
+ * ela ocupa quase toda a página esquerda.
+ */
+.album-card:fullscreen
+  .page-left:has(.mini-photos[style*="display: none"])
+  .main-book-photo,
+.album-card.album-focus-fallback
+  .page-left:has(.mini-photos[style*="display: none"])
+  .main-book-photo {
+  height: clamp(340px, 57vh, 500px) !important;
+}
+
+.album-card:fullscreen .page-right,
+.album-card.album-focus-fallback .page-right {
+  padding: clamp(18px, 3vw, 42px);
+}
+
+.album-card:fullscreen .page-right #memoryText,
+.album-card.album-focus-fallback .page-right #memoryText {
+  max-height: clamp(110px, 17vh, 180px);
+}
+
+.album-card:fullscreen .dots,
+.album-card.album-focus-fallback .dots {
+  flex-shrink: 0;
+  margin-top: 10px;
+}
+
+
+/* TELA CHEIA EM CELULAR E TABLET */
+
+@media (max-width: 900px) {
+  .album-card:fullscreen,
+  .album-card.album-focus-fallback {
+    padding: 14px;
+  }
+
+  .album-card:fullscreen .book,
+  .album-card.album-focus-fallback .book {
+    display: block;
+    padding: 10px 42px;
+    overflow-y: auto;
+  }
+
+  .album-card:fullscreen .book-cover,
+  .album-card.album-focus-fallback .book-cover {
+    width: 100%;
+  }
+
+  .album-card:fullscreen .book-page,
+  .album-card.album-focus-fallback .book-page {
+    height: auto;
+    min-height: 0;
+
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .album-card:fullscreen .book-spine,
+  .album-card.album-focus-fallback .book-spine {
+    display: none;
+  }
+
+  .album-card:fullscreen .main-book-photo,
+  .album-card.album-focus-fallback .main-book-photo {
+    height: 280px !important;
+  }
+
+  .album-card:fullscreen
+    .page-left:has(.mini-photos[style*="display: none"])
+    .main-book-photo,
+  .album-card.album-focus-fallback
+    .page-left:has(.mini-photos[style*="display: none"])
+    .main-book-photo {
+    height: min(52vh, 390px) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .section-title {
+    align-items: center;
+  }
+
+  .album-focus-btn {
+    padding: 9px 11px;
+  }
+
+  .album-focus-btn span:last-child {
+    display: none;
+  }
+
+  .album-card:fullscreen .book,
+  .album-card.album-focus-fallback .book {
+    padding: 8px 32px;
+  }
+
+  .album-card:fullscreen .book-page,
+  .album-card.album-focus-fallback .book-page {
+    padding: 18px;
+  }
+
+  .album-card:fullscreen .main-book-photo,
+  .album-card.album-focus-fallback .main-book-photo {
+    height: 230px !important;
+  }
+
+  .album-card:fullscreen
+    .page-left:has(.mini-photos[style*="display: none"])
+    .main-book-photo,
+  .album-card.album-focus-fallback
+    .page-left:has(.mini-photos[style*="display: none"])
+    .main-book-photo {
+    height: min(45vh, 330px) !important;
+  }
+}

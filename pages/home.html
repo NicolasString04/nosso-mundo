@@ -77,12 +77,25 @@
 
       <section class="main-grid">
 
-        <div class="album-card">
+        <div class="album-card" id="albumCard">
 
           <div class="section-title">
-            <h2>Nosso Álbum</h2>
-            <p>Cada página, uma lembrança.</p>
-          </div>
+  <div>
+    <h2>Nosso Álbum</h2>
+    <p>Cada página, uma lembrança.</p>
+  </div>
+
+  <button
+    type="button"
+    class="album-focus-btn"
+    id="albumFocusBtn"
+    onclick="toggleAlbumFocus()"
+    aria-pressed="false"
+    title="Visualizar o álbum em tela cheia">
+    <span class="album-focus-icon" id="albumFocusIcon">⛶</span>
+    <span id="albumFocusLabel">Tela cheia</span>
+  </button>
+</div>
 
           <div class="book">
 

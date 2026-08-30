@@ -2134,3 +2134,242 @@ window.addEventListener(
 applySavedBackground();
 
 loadMemoriesFromFirebase();
+
+/* =========================================================
+   MODO TELA CHEIA DO ÁLBUM
+========================================================= */
+
+const ALBUM_FOCUS_FALLBACK_CLASS =
+  "album-focus-fallback";
+
+const ALBUM_FOCUS_ACTIVE_CLASS =
+  "album-focus-active";
+
+
+function getAlbumCard() {
+  return document.getElementById(
+    "albumCard"
+  );
+}
+
+
+function isAlbumFocusActive() {
+  const albumCard =
+    getAlbumCard();
+
+  if (!albumCard) {
+    return false;
+  }
+
+  return (
+    document.fullscreenElement === albumCard ||
+    albumCard.classList.contains(
+      ALBUM_FOCUS_FALLBACK_CLASS
+    )
+  );
+}
+
+
+function updateAlbumFocusButton(isActive) {
+  const button =
+    document.getElementById(
+      "albumFocusBtn"
+    );
+
+  const icon =
+    document.getElementById(
+      "albumFocusIcon"
+    );
+
+  const label =
+    document.getElementById(
+      "albumFocusLabel"
+    );
+
+  if (button) {
+    button.setAttribute(
+      "aria-pressed",
+      String(isActive)
+    );
+
+    button.title =
+      isActive
+        ? "Sair da tela cheia"
+        : "Visualizar o álbum em tela cheia";
+  }
+
+  if (icon) {
+    icon.textContent =
+      isActive
+        ? "×"
+        : "⛶";
+  }
+
+  if (label) {
+    label.textContent =
+      isActive
+        ? "Sair da tela cheia"
+        : "Tela cheia";
+  }
+}
+
+
+function activateAlbumFocusClasses() {
+  const albumCard =
+    getAlbumCard();
+
+  if (!albumCard) {
+    return;
+  }
+
+  albumCard.classList.add(
+    ALBUM_FOCUS_ACTIVE_CLASS
+  );
+
+  document.body.classList.add(
+    "album-focus-open"
+  );
+
+  updateAlbumFocusButton(
+    true
+  );
+}
+
+
+function deactivateAlbumFocusClasses() {
+  const albumCard =
+    getAlbumCard();
+
+  if (!albumCard) {
+    return;
+  }
+
+  albumCard.classList.remove(
+    ALBUM_FOCUS_ACTIVE_CLASS,
+    ALBUM_FOCUS_FALLBACK_CLASS
+  );
+
+  document.body.classList.remove(
+    "album-focus-open"
+  );
+
+  updateAlbumFocusButton(
+    false
+  );
+}
+
+
+async function enterAlbumFocus() {
+  const albumCard =
+    getAlbumCard();
+
+  if (!albumCard) {
+    return;
+  }
+
+  activateAlbumFocusClasses();
+
+  if (
+    typeof albumCard.requestFullscreen ===
+    "function"
+  ) {
+    try {
+      await albumCard.requestFullscreen();
+      return;
+    }
+
+    catch (error) {
+      console.warn(
+        "Tela cheia nativa indisponível. Usando modo expandido:",
+        error
+      );
+    }
+  }
+
+  albumCard.classList.add(
+    ALBUM_FOCUS_FALLBACK_CLASS
+  );
+}
+
+
+async function exitAlbumFocus() {
+  const albumCard =
+    getAlbumCard();
+
+  if (!albumCard) {
+    return;
+  }
+
+  if (
+    document.fullscreenElement === albumCard &&
+    typeof document.exitFullscreen ===
+      "function"
+  ) {
+    try {
+      await document.exitFullscreen();
+    }
+
+    catch (error) {
+      console.warn(
+        "Não foi possível sair da tela cheia nativa:",
+        error
+      );
+    }
+  }
+
+  deactivateAlbumFocusClasses();
+}
+
+
+async function toggleAlbumFocus() {
+  if (
+    isAlbumFocusActive()
+  ) {
+    await exitAlbumFocus();
+    return;
+  }
+
+  await enterAlbumFocus();
+}
+
+
+document.addEventListener(
+  "fullscreenchange",
+  () => {
+    const albumCard =
+      getAlbumCard();
+
+    if (!albumCard) {
+      return;
+    }
+
+    if (
+      document.fullscreenElement === albumCard
+    ) {
+      activateAlbumFocusClasses();
+      return;
+    }
+
+    if (
+      !albumCard.classList.contains(
+        ALBUM_FOCUS_FALLBACK_CLASS
+      )
+    ) {
+      deactivateAlbumFocusClasses();
+    }
+  }
+);
+
+
+document.addEventListener(
+  "keydown",
+  (event) => {
+    if (
+      event.key === "Escape" &&
+      isAlbumFocusActive() &&
+      !document.fullscreenElement
+    ) {
+      exitAlbumFocus();
+    }
+  }
+);
