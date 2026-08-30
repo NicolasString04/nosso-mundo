@@ -559,3 +559,176 @@ function applySavedBackground() {
 
 applySavedBackground();
 loadAlbumCards();
+
+/* =========================================================
+   DATAS DAS MEMÓRIAS
+========================================================= */
+
+function isValidISODate(value) {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      value
+    )
+  ) {
+    return false;
+  }
+
+  const [
+    year,
+    month,
+    day
+  ] = value
+    .split("-")
+    .map(Number);
+
+  const date =
+    new Date(
+      year,
+      month - 1,
+      day
+    );
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
+
+function formatDateInPortuguese(dateISO) {
+  if (
+    !isValidISODate(
+      dateISO
+    )
+  ) {
+    return "";
+  }
+
+  const months = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
+  ];
+
+  const [
+    year,
+    month,
+    day
+  ] = dateISO
+    .split("-")
+    .map(Number);
+
+  return (
+    `${day} de ` +
+    `${months[month - 1]} de ` +
+    `${year}`
+  );
+}
+
+
+function convertStoredDateToISO(value) {
+  const originalValue =
+    String(value || "").trim();
+
+  if (!originalValue) {
+    return "";
+  }
+
+  if (
+    isValidISODate(
+      originalValue
+    )
+  ) {
+    return originalValue;
+  }
+
+  const normalizedValue =
+    originalValue
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .toLowerCase();
+
+  const match =
+    normalizedValue.match(
+      /^(\d{1,2})\s+de\s+([a-z]+)\s+de\s+(\d{4})$/
+    );
+
+  if (!match) {
+    return "";
+  }
+
+  const monthNames = [
+    "janeiro",
+    "fevereiro",
+    "marco",
+    "abril",
+    "maio",
+    "junho",
+    "julho",
+    "agosto",
+    "setembro",
+    "outubro",
+    "novembro",
+    "dezembro"
+  ];
+
+  const day =
+    Number(match[1]);
+
+  const month =
+    monthNames.indexOf(
+      match[2]
+    ) + 1;
+
+  const year =
+    Number(match[3]);
+
+  if (!month) {
+    return "";
+  }
+
+  const dateISO =
+    `${String(year).padStart(4, "0")}-` +
+    `${String(month).padStart(2, "0")}-` +
+    `${String(day).padStart(2, "0")}`;
+
+  return isValidISODate(dateISO)
+    ? dateISO
+    : "";
+}
+
+
+function getMemoryDateText(
+  dateISO,
+  legacyDate
+) {
+  const normalizedDate =
+    dateISO ||
+    convertStoredDateToISO(
+      legacyDate
+    );
+
+  if (normalizedDate) {
+    return formatDateInPortuguese(
+      normalizedDate
+    );
+  }
+
+  return (
+    legacyDate ||
+    "Sem data"
+  );
+}
