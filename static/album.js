@@ -4,6 +4,11 @@ let editingId = null;
 let currentMain = emptyMedia();
 let currentSubs = createEmptySubs();
 
+let albumMemories = [];
+let originalMemoryIds = [];
+let isOrganizing = false;
+let draggedMemoryId = null;
+
 function emptyMedia() {
   return { url: "", type: "" };
 }
@@ -278,6 +283,14 @@ function normalizeMemory(doc) {
 
     dateISO,
 
+    order:
+      Number.isFinite(data.order)
+        ? data.order
+        : null,
+
+    createdAt:
+      data.createdAt || null,
+
     text: data.text || "",
     music: data.music || "",
 
@@ -291,6 +304,217 @@ function normalizeMemory(doc) {
 
     subs
   };
+}
+
+function timestampToMillis(timestamp) {
+  if (!timestamp) return 0;
+
+  if (typeof timestamp.toMillis === "function") {
+    return timestamp.toMillis();
+  }
+
+  if (timestamp instanceof Date) {
+    return timestamp.getTime();
+  }
+
+  return 0;
+}
+
+function compareMemoryOrder(first, second) {
+  const firstHasOrder =
+    Number.isFinite(first.order);
+
+  const secondHasOrder =
+    Number.isFinite(second.order);
+
+  if (firstHasOrder && secondHasOrder) {
+    return first.order - second.order;
+  }
+
+  if (firstHasOrder !== secondHasOrder) {
+    return firstHasOrder ? -1 : 1;
+  }
+
+  return (
+    timestampToMillis(first.createdAt) -
+    timestampToMillis(second.createdAt)
+  );
+}
+
+function sortAlbumMemories(memories) {
+  return [...memories].sort(compareMemoryOrder);
+}
+
+function moveMemory(fromIndex, toIndex) {
+  if (
+    !isOrganizing ||
+    fromIndex === toIndex ||
+    toIndex < 0 ||
+    toIndex >= albumMemories.length
+  ) {
+    return;
+  }
+
+  const [memory] =
+    albumMemories.splice(fromIndex, 1);
+
+  albumMemories.splice(toIndex, 0, memory);
+  renderAlbumGrid();
+}
+
+function createOrderControls(index) {
+  const controls = document.createElement("div");
+  controls.className = "order-controls";
+
+  const position = document.createElement("span");
+  position.className = "memory-position";
+  position.textContent =
+    `${index + 1}ª posição`;
+
+  const upButton = document.createElement("button");
+  upButton.type = "button";
+  upButton.className = "order-arrow";
+  upButton.textContent = "↑";
+  upButton.title = "Mover memória para cima";
+  upButton.setAttribute(
+    "aria-label",
+    "Mover memória para cima"
+  );
+  upButton.disabled = index === 0;
+
+  upButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    moveMemory(index, index - 1);
+  });
+
+  const downButton = document.createElement("button");
+  downButton.type = "button";
+  downButton.className = "order-arrow";
+  downButton.textContent = "↓";
+  downButton.title = "Mover memória para baixo";
+  downButton.setAttribute(
+    "aria-label",
+    "Mover memória para baixo"
+  );
+  downButton.disabled =
+    index === albumMemories.length - 1;
+
+  downButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    moveMemory(index, index + 1);
+  });
+
+  controls.append(
+    position,
+    upButton,
+    downButton
+  );
+
+  return controls;
+}
+
+function clearDragStyles() {
+  document
+    .querySelectorAll(
+      ".memory-card.dragging, .memory-card.drag-over"
+    )
+    .forEach((card) => {
+      card.classList.remove(
+        "dragging",
+        "drag-over"
+      );
+    });
+}
+
+function handleDragStart(event, memoryId) {
+  if (!isOrganizing) {
+    event.preventDefault();
+    return;
+  }
+
+  draggedMemoryId = memoryId;
+
+  event.currentTarget.classList.add(
+    "dragging"
+  );
+
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData(
+    "text/plain",
+    memoryId
+  );
+}
+
+function handleDragOver(event) {
+  if (!isOrganizing) return;
+
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+
+  clearDragStyles();
+
+  event.currentTarget.classList.add(
+    "drag-over"
+  );
+}
+
+function handleDrop(event, targetMemoryId) {
+  if (!isOrganizing) return;
+
+  event.preventDefault();
+
+  const sourceMemoryId =
+    draggedMemoryId ||
+    event.dataTransfer.getData("text/plain");
+
+  if (
+    !sourceMemoryId ||
+    sourceMemoryId === targetMemoryId
+  ) {
+    clearDragStyles();
+    return;
+  }
+
+  const sourceIndex =
+    albumMemories.findIndex(
+      (memory) => memory.id === sourceMemoryId
+    );
+
+  const targetIndex =
+    albumMemories.findIndex(
+      (memory) => memory.id === targetMemoryId
+    );
+
+  if (
+    sourceIndex === -1 ||
+    targetIndex === -1
+  ) {
+    clearDragStyles();
+    return;
+  }
+
+  const [memory] =
+    albumMemories.splice(sourceIndex, 1);
+
+  const updatedTargetIndex =
+    albumMemories.findIndex(
+      (item) => item.id === targetMemoryId
+    );
+
+  albumMemories.splice(
+    updatedTargetIndex,
+    0,
+    memory
+  );
+
+  draggedMemoryId = null;
+  clearDragStyles();
+  renderAlbumGrid();
+}
+
+function handleDragEnd() {
+  draggedMemoryId = null;
+  clearDragStyles();
 }
 
 function getCardMedia(memory) {
@@ -341,9 +565,37 @@ function createCardMedia(memory) {
   return mediaWrapper;
 }
 
-function createMemoryCard(memory) {
+function createMemoryCard(memory, index) {
   const card = document.createElement("article");
   card.className = "memory-card";
+  card.dataset.memoryId = memory.id;
+
+  if (isOrganizing) {
+    card.classList.add("organizing-card");
+    card.draggable = true;
+
+    card.addEventListener(
+      "dragstart",
+      (event) =>
+        handleDragStart(event, memory.id)
+    );
+
+    card.addEventListener(
+      "dragover",
+      handleDragOver
+    );
+
+    card.addEventListener(
+      "drop",
+      (event) =>
+        handleDrop(event, memory.id)
+    );
+
+    card.addEventListener(
+      "dragend",
+      handleDragEnd
+    );
+  }
 
   card.appendChild(createCardMedia(memory));
 
@@ -388,9 +640,16 @@ function createMemoryCard(memory) {
   info.append(
     title,
     description,
-    musicChip,
-    actions
+    musicChip
   );
+
+  if (isOrganizing) {
+    info.appendChild(
+      createOrderControls(index)
+    );
+  }
+
+  info.appendChild(actions);
 
   card.appendChild(info);
 
@@ -407,24 +666,44 @@ function renderEmptyAlbum() {
   grid.appendChild(emptyState);
 }
 
+function renderAlbumGrid() {
+  grid.innerHTML = "";
+
+  grid.classList.toggle(
+    "organizing",
+    isOrganizing
+  );
+
+  if (albumMemories.length === 0) {
+    renderEmptyAlbum();
+    return;
+  }
+
+  albumMemories.forEach((memory, index) => {
+    const card =
+      createMemoryCard(memory, index);
+
+    grid.appendChild(card);
+  });
+}
+
 function loadAlbumCards() {
   db.collection("memories")
     .orderBy("createdAt", "asc")
     .onSnapshot(
       (snapshot) => {
-        grid.innerHTML = "";
-
-        if (snapshot.empty) {
-          renderEmptyAlbum();
+        if (isOrganizing) {
           return;
         }
 
-        snapshot.forEach((doc) => {
-          const memory = normalizeMemory(doc);
-          const card = createMemoryCard(memory);
+        albumMemories =
+          sortAlbumMemories(
+            snapshot.docs.map(
+              (doc) => normalizeMemory(doc)
+            )
+          );
 
-          grid.appendChild(card);
-        });
+        renderAlbumGrid();
       },
 
       (error) => {
@@ -447,6 +726,153 @@ function loadAlbumCards() {
         grid.appendChild(errorState);
       }
     );
+}
+
+function updateOrganizeInterface() {
+  const toolbar =
+    document.getElementById(
+      "organizeToolbar"
+    );
+
+  const organizeButton =
+    document.getElementById(
+      "organizeBtn"
+    );
+
+  if (toolbar) {
+    toolbar.hidden = !isOrganizing;
+  }
+
+  if (organizeButton) {
+    organizeButton.hidden = isOrganizing;
+  }
+
+  grid.classList.toggle(
+    "organizing",
+    isOrganizing
+  );
+}
+
+function enterOrganizeMode() {
+  if (albumMemories.length === 0) {
+    alert(
+      "Ainda não existem memórias para organizar."
+    );
+    return;
+  }
+
+  originalMemoryIds =
+    albumMemories.map(
+      (memory) => memory.id
+    );
+
+  isOrganizing = true;
+  updateOrganizeInterface();
+  renderAlbumGrid();
+}
+
+function cancelOrganizeMode() {
+  const memoriesById =
+    new Map(
+      albumMemories.map(
+        (memory) => [
+          memory.id,
+          memory
+        ]
+      )
+    );
+
+  const restoredMemories =
+    originalMemoryIds
+      .map((id) => memoriesById.get(id))
+      .filter(Boolean);
+
+  const restoredIds =
+    new Set(originalMemoryIds);
+
+  const newMemories =
+    albumMemories.filter(
+      (memory) =>
+        !restoredIds.has(memory.id)
+    );
+
+  albumMemories = [
+    ...restoredMemories,
+    ...newMemories
+  ];
+
+  isOrganizing = false;
+  originalMemoryIds = [];
+
+  updateOrganizeInterface();
+  renderAlbumGrid();
+}
+
+async function saveMemoryOrder() {
+  if (!isOrganizing) return;
+
+  const saveButton =
+    document.getElementById(
+      "saveOrderBtn"
+    );
+
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent =
+      "Salvando...";
+  }
+
+  try {
+    const batch = db.batch();
+
+    albumMemories.forEach(
+      (memory, index) => {
+        const reference =
+          db
+            .collection("memories")
+            .doc(memory.id);
+
+        batch.update(
+          reference,
+          { order: index }
+        );
+      }
+    );
+
+    await batch.commit();
+
+    albumMemories =
+      albumMemories.map(
+        (memory, index) => ({
+          ...memory,
+          order: index
+        })
+      );
+
+    isOrganizing = false;
+    originalMemoryIds = [];
+
+    updateOrganizeInterface();
+    renderAlbumGrid();
+
+    alert("Ordem das memórias salva 💖");
+  } catch (error) {
+    console.error(
+      "Erro ao salvar ordem:",
+      error
+    );
+
+    alert(
+      "Não foi possível salvar a ordem: " +
+      error.message
+    );
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent =
+        "Salvar ordem 💖";
+    }
+  }
 }
 
 function renderCurrentMediaInfo() {

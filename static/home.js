@@ -1633,11 +1633,19 @@ dateISO:
 
 
         subTypes:
-          subTypes,
+  subTypes,
 
 
-        createdAt:
-          new Date()
+/*
+ * Memórias novas entram no final
+ * da ordem escolhida.
+ */
+order:
+  Date.now(),
+
+
+createdAt:
+  new Date()
 
       });
 
@@ -1804,9 +1812,22 @@ dateISO:
   ),
 
 
-              text:
-                data.text ||
-                "",
+order:
+  Number.isFinite(
+    data.order
+  )
+    ? data.order
+    : null,
+
+
+createdAt:
+  data.createdAt ||
+  null,
+
+
+text:
+  data.text ||
+  "",
 
 
               music:
@@ -2558,5 +2579,124 @@ function getMemoryDateText(
   return (
     legacyDate ||
     "Sem data"
+  );
+}
+
+/* =========================================================
+   ORDEM PERSONALIZADA DAS MEMÓRIAS
+========================================================= */
+
+function getMemoryTimestamp(
+  timestamp
+) {
+  if (!timestamp) {
+    return 0;
+  }
+
+
+  if (
+    typeof timestamp.toMillis ===
+    "function"
+  ) {
+    return timestamp.toMillis();
+  }
+
+
+  if (
+    timestamp instanceof Date
+  ) {
+    return timestamp.getTime();
+  }
+
+
+  return 0;
+}
+
+
+function sortMemoriesBySavedOrder(
+  memoryList
+) {
+  /*
+   * As posições salvas manualmente
+   * são números pequenos: 0, 1, 2...
+   * Memórias novas usam Date.now().
+   */
+
+  const hasManualOrder =
+    memoryList.some(
+      (memory) =>
+        Number.isFinite(
+          memory.order
+        ) &&
+        memory.order <
+          1000000000
+    );
+
+
+  memoryList.sort(
+    (
+      first,
+      second
+    ) => {
+
+      const firstHasOrder =
+        Number.isFinite(
+          first.order
+        );
+
+
+      const secondHasOrder =
+        Number.isFinite(
+          second.order
+        );
+
+
+      if (hasManualOrder) {
+
+        if (
+          firstHasOrder &&
+          secondHasOrder
+        ) {
+          return (
+            first.order -
+            second.order
+          );
+        }
+
+
+        if (
+          firstHasOrder !==
+          secondHasOrder
+        ) {
+          return firstHasOrder
+            ? -1
+            : 1;
+        }
+
+      }
+
+
+      const firstPosition =
+        firstHasOrder
+          ? first.order
+          : getMemoryTimestamp(
+              first.createdAt
+            );
+
+
+      const secondPosition =
+        secondHasOrder
+          ? second.order
+          : getMemoryTimestamp(
+              second.createdAt
+            );
+
+
+      return (
+        firstPosition -
+        secondPosition
+      );
+
+    }
   );
 }

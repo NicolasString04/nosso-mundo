@@ -37,13 +37,56 @@
     <section class="album-content">
 
       <header class="album-header">
-        <div>
-          <h1>Álbum de Fotos</h1>
-          <p>Todas as nossas memórias reunidas em um só lugar.</p>
-        </div>
+  <div>
+    <h1>Álbum de Fotos</h1>
+    <p>Todas as nossas memórias reunidas em um só lugar.</p>
+  </div>
 
-        <a class="back-btn" href="/home">Voltar ao livro 💖</a>
-      </header>
+  <div class="album-header-actions">
+    <button
+      type="button"
+      class="organize-btn"
+      id="organizeBtn"
+      onclick="enterOrganizeMode()">
+      ↕ Organizar memórias
+    </button>
+
+    <a class="back-btn" href="/home">
+      Voltar ao livro 💖
+    </a>
+  </div>
+</header>
+
+<section
+  class="organize-toolbar"
+  id="organizeToolbar"
+  hidden>
+
+  <div>
+    <strong>Organizando memórias</strong>
+
+    <p>
+      Arraste os cards ou use as setas para escolher a ordem.
+    </p>
+  </div>
+
+  <div class="organize-toolbar-actions">
+    <button
+      type="button"
+      class="cancel-order-btn"
+      onclick="cancelOrganizeMode()">
+      Cancelar
+    </button>
+
+    <button
+      type="button"
+      class="save-order-btn"
+      id="saveOrderBtn"
+      onclick="saveMemoryOrder()">
+      Salvar ordem 💖
+    </button>
+  </div>
+</section>
 
       <section class="memory-grid" id="memoryGrid">
         <!-- Cards entram pelo JavaScript -->

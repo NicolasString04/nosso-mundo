@@ -432,3 +432,239 @@ body {
   color: #ffb3c6;
   opacity: 0.88;
 }
+
+/* =========================================================
+   ORGANIZAÇÃO DAS MEMÓRIAS
+========================================================= */
+
+.album-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.organize-btn,
+.cancel-order-btn,
+.save-order-btn {
+  padding: 12px 16px;
+
+  border: none;
+  border-radius: 14px;
+
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.organize-btn {
+  border: 1px solid rgba(255, 120, 160, 0.55);
+  background: rgba(255, 77, 109, 0.15);
+}
+
+.organize-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 77, 109, 0.3);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.35);
+}
+
+.organize-toolbar {
+  margin-bottom: 24px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  border-radius: 18px;
+  border: 1px solid rgba(255, 120, 160, 0.32);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 77, 109, 0.16),
+      rgba(142, 68, 173, 0.14)
+    );
+
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.organize-toolbar[hidden],
+.organize-btn[hidden] {
+  display: none !important;
+}
+
+.organize-toolbar strong {
+  color: #ffb3c6;
+}
+
+.organize-toolbar p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.78;
+}
+
+.organize-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cancel-order-btn {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cancel-order-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.save-order-btn {
+  background:
+    linear-gradient(
+      45deg,
+      #ff4d6d,
+      #ff8fab
+    );
+
+  box-shadow: 0 0 16px rgba(255, 77, 109, 0.35);
+}
+
+.save-order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(255, 77, 109, 0.55);
+}
+
+.save-order-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+.memory-grid.organizing {
+  user-select: none;
+}
+
+.memory-card.organizing-card {
+  cursor: grab;
+
+  border-color: rgba(255, 143, 171, 0.72);
+  box-shadow:
+    0 0 0 2px rgba(255, 77, 109, 0.12),
+    0 18px 36px rgba(0, 0, 0, 0.3);
+}
+
+.memory-card.organizing-card:active {
+  cursor: grabbing;
+}
+
+.memory-card.organizing-card:hover {
+  transform: translateY(-3px);
+}
+
+.memory-card.dragging {
+  opacity: 0.4;
+  transform: scale(0.97);
+}
+
+.memory-card.drag-over {
+  border-color: #ff8fab;
+
+  box-shadow:
+    0 0 0 3px rgba(255, 77, 109, 0.26),
+    0 20px 42px rgba(255, 77, 109, 0.28);
+}
+
+.memory-grid.organizing .memory-photo img,
+.memory-grid.organizing .memory-photo video {
+  pointer-events: none;
+}
+
+.memory-grid.organizing .card-actions {
+  display: none;
+}
+
+.order-controls {
+  display: grid;
+  grid-template-columns: 1fr 42px 42px;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 15px;
+  padding: 9px;
+
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.memory-position {
+  padding-left: 5px;
+
+  color: #ffb3c6;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.order-arrow {
+  width: 42px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 143, 171, 0.35);
+  border-radius: 10px;
+
+  color: white;
+  background: rgba(255, 77, 109, 0.2);
+
+  font-size: 20px;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.order-arrow:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #ff4d6d;
+}
+
+.order-arrow:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+
+/* ORGANIZAÇÃO EM CELULAR */
+
+@media (max-width: 700px) {
+  .album-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .organize-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .organize-toolbar-actions {
+    width: 100%;
+  }
+
+  .cancel-order-btn,
+  .save-order-btn {
+    flex: 1;
+  }
+
+  .memory-card.organizing-card {
+    cursor: default;
+  }
+}
