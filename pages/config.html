@@ -26,13 +26,43 @@
       </div>
 
       <nav>
-        <a href="/home">🏠 Início</a>
-        <a href="/album">🖼️ Álbum de Fotos</a>
-        <a href="/viagens">
-  ✈️ Viagens
-</a>
-        <a class="active" href="/config">⚙️ Configurações</a>
-      </nav>
+
+  <a
+    href="/home"
+    class="{{ 'active' if request.path == '/home' else '' }}"
+  >
+    🏠 Início
+  </a>
+
+  <a
+    href="/album"
+    class="{{ 'active' if request.path.startswith('/album') else '' }}"
+  >
+    🖼️ Álbum de Fotos
+  </a>
+
+  <a
+    href="/viagens"
+    class="{{ 'active' if request.path.startswith('/viagens') else '' }}"
+  >
+    ✈️ Viagens
+  </a>
+
+  <a
+    href="/saudade"
+    class="{{ 'active' if request.path == '/saudade' else '' }}"
+  >
+    ♡ Cantinho da Saudade
+  </a>
+
+  <a
+    href="/config"
+    class="{{ 'active' if request.path == '/config' else '' }}"
+  >
+    ⚙️ Configurações
+  </a>
+
+</nav>
 
       <button class="logout-btn" onclick="logout()">Sair</button>
     </aside>

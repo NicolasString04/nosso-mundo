@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <script>
+    document.documentElement.style.visibility = "hidden";
+  </script>
+
+  <title>Cantinho da Saudade ❤️</title>
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='saudade.css') }}"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+</head>
+
+
+<body>
+
+  <div class="saudade-background-effects">
+    <span class="floating-heart heart-one">♡</span>
+    <span class="floating-heart heart-two">♡</span>
+    <span class="floating-heart heart-three">♡</span>
+    <span class="floating-heart heart-four">♡</span>
+  </div>
+
+
+  <main class="saudade-wrapper">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+      <div class="logo-area">
+
+        <div class="logo-heart">
+          ♡
+        </div>
+
+        <h2>
+          Nosso Mundo
+        </h2>
+
+        <p>
+          só nosso
+        </p>
+
+      </div>
+
+
+      <nav>
+
+  <a
+    href="/home"
+    class="{{ 'active' if request.path == '/home' else '' }}"
+  >
+    🏠 Início
+  </a>
+
+  <a
+    href="/album"
+    class="{{ 'active' if request.path.startswith('/album') else '' }}"
+  >
+    🖼️ Álbum de Fotos
+  </a>
+
+  <a
+    href="/viagens"
+    class="{{ 'active' if request.path.startswith('/viagens') else '' }}"
+  >
+    ✈️ Viagens
+  </a>
+
+  <a
+    href="/saudade"
+    class="{{ 'active' if request.path == '/saudade' else '' }}"
+  >
+    ♡ Cantinho da Saudade
+  </a>
+
+  <a
+    href="/config"
+    class="{{ 'active' if request.path == '/config' else '' }}"
+  >
+    ⚙️ Configurações
+  </a>
+
+</nav>
+
+
+      <div class="sidebar-bottom">
+
+        <div class="sidebar-quote">
+          Quando bater<br>
+          saudade, me<br>
+          chama aqui.
+          <span>♡</span>
+        </div>
+
+        <button
+          type="button"
+          class="logout-btn"
+          onclick="logout()"
+        >
+          Sair
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CONTEÚDO
+    ====================================================== -->
+
+    <section class="saudade-content">
+
+
+      <!-- ===================================================
+           HEADER
+      ==================================================== -->
+
+      <header class="saudade-header">
+
+        <div class="header-copy">
+
+          <div class="header-title-row">
+
+            <h1>
+              Cantinho da Saudade
+            </h1>
+
+            <span class="header-heart">
+              ♡
+            </span>
+
+          </div>
+
+          <p>
+            Um cantinho só nosso para dizer
+            quando o coração apertar.
+          </p>
+
+        </div>
+
+
+        <div class="header-message">
+          Um toque e o<br>
+          outro sente.
+          <span>♡</span>
+        </div>
+
+      </header>
+
+
+      <!-- ===================================================
+           GRID PRINCIPAL
+      ==================================================== -->
+
+      <section class="saudade-grid">
+
+
+        <!-- =================================================
+             COLUNA ESQUERDA
+        ================================================== -->
+
+        <div class="saudade-main-column">
+
+
+          <!-- CARD PRINCIPAL -->
+
+          <article class="send-saudade-card">
+
+            <div class="heart-scene">
+
+              <div class="heart-glow"></div>
+
+              <div class="main-heart">
+                ♡
+              </div>
+
+              <span class="mini-heart mini-heart-1">
+                ♡
+              </span>
+
+              <span class="mini-heart mini-heart-2">
+                ♡
+              </span>
+
+              <span class="mini-heart mini-heart-3">
+                ♡
+              </span>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="send-saudade-btn"
+              id="sendSaudadeBtn"
+              onclick="openSaudadeConfirmation()"
+            >
+
+              <span class="button-heart">
+                ♡
+              </span>
+
+              <span>
+                Tô com saudades
+              </span>
+
+            </button>
+
+
+            <p class="send-description">
+              Envie um carinho instantâneo
+              para quem você ama.
+            </p>
+
+
+            <div class="send-meta">
+
+              <div class="send-meta-card">
+
+                <span class="meta-icon">
+                  ♡
+                </span>
+
+                <span>
+                  Destino:
+                  <strong id="recipientName">
+                    Sofia
+                  </strong>
+                </span>
+
+              </div>
+
+
+              <div class="send-meta-card">
+
+                <span class="meta-icon">
+                  ✉
+                </span>
+
+                <span>
+                  Canal atual:
+                  <strong>
+                    E-mail
+                  </strong>
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <p
+              class="cooldown-message"
+              id="cooldownMessage"
+              hidden
+            >
+              O próximo carinho poderá ser enviado em breve. ❤️
+            </p>
+
+          </article>
+
+
+          <!-- CARD ROMÂNTICO -->
+
+          <article class="romantic-card">
+
+            <div class="romantic-visual">
+
+              <div class="candle">
+                <div class="candle-flame"></div>
+                <div class="candle-body"></div>
+              </div>
+
+              <div class="love-letter">
+
+                <span class="letter-line">
+                  Saudade é
+                </span>
+
+                <span class="letter-line">
+                  amor morando
+                </span>
+
+                <span class="letter-line">
+                  em lembrança.
+                </span>
+
+                <span class="letter-heart">
+                  ♡
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="romantic-quote">
+
+              <span class="quote-mark">
+                “
+              </span>
+
+              <p>
+                A saudade é o jeitinho
+                do coração lembrar
+                do que é verdadeiramente nosso.
+              </p>
+
+              <span class="quote-heart">
+                ♡
+              </span>
+
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <!-- =================================================
+             COLUNA DIREITA
+        ================================================== -->
+
+        <aside class="saudade-side-column">
+
+
+          <!-- PRÉVIA DO E-MAIL -->
+
+          <article class="side-card email-preview-card">
+
+            <div class="side-card-title">
+
+              <span>
+                ✉
+              </span>
+
+              <h2>
+                Prévia do e-mail
+              </h2>
+
+            </div>
+
+
+            <div class="email-preview">
+
+              <div class="email-preview-heart">
+                ❤️
+              </div>
+
+              <p class="email-preview-title">
+                Alguém sentiu saudades de você ❤️
+              </p>
+
+              <p
+                class="email-preview-time"
+                id="emailPreviewTime"
+              >
+                às --:--
+              </p>
+
+              <div class="email-preview-divider">
+
+                <span></span>
+
+                <b>
+                  ♥
+                </b>
+
+                <span></span>
+
+              </div>
+
+              <p class="email-preview-from">
+
+                De
+
+                <strong id="previewSenderName">
+                  Nicolas
+                </strong>
+
+                para
+
+                <strong id="previewRecipientName">
+                  Sofia
+                </strong>.
+
+              </p>
+
+              <p class="email-preview-message">
+                Passei por aqui para dizer
+                que estou com saudades de você. 💕
+              </p>
+
+
+              <div class="email-preview-button">
+                Abrir Nosso Mundo
+              </div>
+
+            </div>
+
+
+            <p class="email-preview-footer">
+              Eu te amo, meu amor. ♡
+            </p>
+
+          </article>
+
+
+          <!-- ÚLTIMAS SAUDADES -->
+
+          <article class="side-card history-card">
+
+            <div class="side-card-title">
+
+              <span>
+                ◷
+              </span>
+
+              <h2>
+                Últimas saudades
+              </h2>
+
+            </div>
+
+
+            <div
+              class="saudade-history"
+              id="saudadeHistory"
+            >
+
+              <div class="history-empty">
+
+                <span>
+                  ♡
+                </span>
+
+                <p>
+                  Nenhuma saudade enviada ainda.
+                </p>
+
+                <small>
+                  O primeiro carinho vai aparecer aqui.
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="view-all-history-btn"
+              id="viewAllHistoryBtn"
+              hidden
+            >
+              Ver todas as mensagens
+            </button>
+
+          </article>
+
+
+          <!-- NOTIFICAÇÕES -->
+
+          <article class="side-card notification-card">
+
+            <div class="side-card-title">
+
+              <span>
+                ♡
+              </span>
+
+              <h2>
+                Notificações
+              </h2>
+
+            </div>
+
+
+            <div class="notification-option">
+
+              <div class="notification-left">
+
+                <span class="notification-icon">
+                  ✉
+                </span>
+
+                <span>
+                  E-mail
+                </span>
+
+              </div>
+
+              <div class="notification-status active">
+                Ativo
+                <span></span>
+              </div>
+
+            </div>
+
+
+            <div class="notification-option disabled">
+
+              <div class="notification-left">
+
+                <span class="notification-icon">
+                  💬
+                </span>
+
+                <span>
+                  SMS
+                </span>
+
+              </div>
+
+              <div class="notification-status">
+                Em breve
+              </div>
+
+            </div>
+
+
+            <p class="notification-note">
+              Avisos para não perder nenhum carinho. ♡
+            </p>
+
+          </article>
+
+        </aside>
+
+      </section>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       CONFIRMAÇÃO DO ENVIO
+  ====================================================== -->
+
+  <div
+    class="saudade-modal-overlay"
+    id="saudadeModal"
+  >
+
+    <div class="saudade-modal">
+
+      <button
+        type="button"
+        class="close-saudade-modal"
+        onclick="closeSaudadeConfirmation()"
+      >
+        ×
+      </button>
+
+
+      <div class="modal-heart">
+        ♡
+      </div>
+
+
+      <h2>
+        Mandar uma saudade?
+      </h2>
+
+
+      <p>
+        Sofia vai receber um carinho
+        seu por e-mail. ❤️
+      </p>
+
+
+      <div class="modal-preview">
+
+        <strong>
+          Alguém sentiu saudades de você ❤️
+        </strong>
+
+        <span id="confirmationTime">
+          às --:--
+        </span>
+
+        <small>
+          De Nicolas para Sofia.
+        </small>
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="cancel-send-btn"
+          onclick="closeSaudadeConfirmation()"
+        >
+          Agora não
+        </button>
+
+
+        <button
+          type="button"
+          class="confirm-send-btn"
+          id="confirmSendBtn"
+          onclick="sendSaudade()"
+        >
+          ♡ Enviar saudade
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       TOAST / FEEDBACK
+  ====================================================== -->
+
+  <div
+    class="saudade-toast"
+    id="saudadeToast"
+    role="status"
+    aria-live="polite"
+  >
+
+    <span class="toast-heart">
+      ❤️
+    </span>
+
+    <div>
+
+      <strong id="toastTitle">
+        Saudade enviada!
+      </strong>
+
+      <p id="toastMessage">
+        Seu carinho foi guardado no Nosso Mundo.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FIREBASE
+  ====================================================== -->
+
+  <script
+    src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+  ></script>
+
+  <script
+    src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+  ></script>
+
+  <script
+    src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+  ></script>
+
+
+  <script
+    src="{{ url_for('static', filename='firebase.js') }}"
+  ></script>
+
+
+  <script
+    src="{{ url_for('static', filename='auth-guard.js') }}"
+    data-page-script="{{ url_for('static', filename='saudade.js') }}"
+  >
+  </script>
+
+</body>
+
+</html>
