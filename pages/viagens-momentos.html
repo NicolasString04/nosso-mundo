@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <script>
+    document.documentElement.style.visibility = "hidden";
+  </script>
+
+  <title>Momentos da viagem ❤️</title>
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='viagem-momentos.css') }}"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+</head>
+
+<body>
+
+  <main
+    class="moments-wrapper"
+    id="momentsPage"
+    data-trip-id="{{ trip_id }}"
+  >
+
+    <aside class="sidebar">
+
+      <div class="logo-area">
+        <div class="logo-heart">
+          ♡
+        </div>
+
+        <h2>
+          Nosso Mundo
+        </h2>
+
+        <p>
+          só nosso
+        </p>
+      </div>
+
+
+      <nav>
+        <a href="/home">
+          🏠 Início
+        </a>
+
+        <a href="/album">
+          🖼️ Álbum de Fotos
+        </a>
+
+        <a
+          class="active"
+          href="/viagens"
+        >
+          ✈️ Viagens
+        </a>
+
+        <a href="/config">
+          ⚙️ Configurações
+        </a>
+      </nav>
+
+
+      <div class="sidebar-quote">
+        Cada lugar fica especial<br>
+        quando estamos juntos.
+      </div>
+
+
+      <button
+        type="button"
+        class="logout-btn"
+        onclick="logout()"
+      >
+        Sair
+      </button>
+
+    </aside>
+
+
+    <section class="moments-content">
+
+      <div class="breadcrumbs">
+        <a href="/viagens">
+          Viagens
+        </a>
+
+        <span>›</span>
+
+        <a
+          href="/viagens"
+          id="breadcrumbTripName"
+        >
+          Viagem
+        </a>
+
+        <span>›</span>
+
+        <strong>
+          Todos os momentos
+        </strong>
+      </div>
+
+
+      <header class="moments-header">
+
+        <div>
+          <h1>
+            Momentos de
+            <span id="momentsTripName">
+              nossa viagem
+            </span>
+            ♡
+          </h1>
+
+          <p>
+            Tudo o que queremos viver e guardar dessa viagem.
+          </p>
+        </div>
+
+
+        <div class="header-actions">
+
+          <a
+            class="back-trip-btn"
+            href="/viagens"
+          >
+            ← Voltar para a viagem
+          </a>
+
+          <button
+            type="button"
+            class="add-moment-btn"
+            onclick="openMomentModal()"
+          >
+            ＋ Adicionar momento
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <div class="moments-layout">
+
+        <section class="gallery-section">
+
+          <div
+            class="gallery-filters"
+            id="galleryFilters"
+          >
+
+            <button
+              type="button"
+              class="filter-btn active"
+              data-filter="all"
+              onclick="setMomentFilter('all')"
+            >
+              ▦ Todos
+            </button>
+
+            <button
+              type="button"
+              class="filter-btn"
+              data-filter="image"
+              onclick="setMomentFilter('image')"
+            >
+              🖼️ Fotos
+            </button>
+
+            <button
+              type="button"
+              class="filter-btn"
+              data-filter="video"
+              onclick="setMomentFilter('video')"
+            >
+              ▣ Vídeos
+            </button>
+
+          </div>
+
+
+          <section
+            class="moment-grid"
+            id="momentGrid"
+          >
+            <!-- Fotos e vídeos entram pelo JavaScript -->
+          </section>
+
+
+          <section
+            class="moments-empty-state"
+            id="momentsEmptyState"
+            hidden
+          >
+            <span>
+              📷
+            </span>
+
+            <h2>
+              Os momentos dessa viagem começam aqui
+            </h2>
+
+            <p>
+              Adicione fotos e vídeos para guardar
+              tudo o que vocês viverem juntos.
+            </p>
+
+            <button
+              type="button"
+              onclick="openMomentModal()"
+            >
+              Adicionar primeiro momento
+            </button>
+          </section>
+
+        </section>
+
+
+        <aside class="trip-information">
+
+          <section class="information-card trip-about-card">
+
+            <h2>
+              ♡ Sobre esta viagem
+            </h2>
+
+            <h3 id="informationTripName">
+              Nossa viagem
+            </h3>
+
+            <p
+              class="information-trip-subtitle"
+              id="informationTripSubtitle"
+            >
+              Nosso sonho, nossa história.
+            </p>
+
+            <p
+              class="information-trip-notes"
+              id="informationTripNotes"
+            >
+              Nenhuma anotação adicionada.
+            </p>
+
+            <div class="information-divider">
+              <span>♡</span>
+            </div>
+
+            <div class="information-meta">
+
+              <p>
+                <span>🗓️</span>
+
+                <strong id="informationTripDate">
+                  A definir
+                </strong>
+              </p>
+
+              <p>
+                <span>📍</span>
+
+                <strong id="informationTripLocation">
+                  A definir
+                </strong>
+              </p>
+
+            </div>
+
+            <a
+              class="view-trip-details-btn"
+              href="/viagens"
+            >
+              Ver detalhes da viagem
+              <span>›</span>
+            </a>
+
+          </section>
+
+
+          <section class="information-card soundtrack-card">
+
+            <h2>
+              ♡ Trilha sonora da viagem
+            </h2>
+
+            <div
+              class="moments-music"
+              id="momentsTripMusic"
+            >
+              <p>
+                Nenhuma música adicionada.
+              </p>
+            </div>
+
+          </section>
+
+
+          <section class="information-card statistics-card">
+
+            <h2>
+              ♡ Nossas memórias juntas
+            </h2>
+
+            <div class="statistics-grid">
+
+              <div>
+                <span>🖼️</span>
+
+                <strong id="photoCount">
+                  0
+                </strong>
+
+                <small>
+                  Fotos
+                </small>
+              </div>
+
+              <div>
+                <span>▶️</span>
+
+                <strong id="videoCount">
+                  0
+                </strong>
+
+                <small>
+                  Vídeos
+                </small>
+              </div>
+
+              <div>
+                <span>♡</span>
+
+                <strong id="momentCount">
+                  0
+                </strong>
+
+                <small>
+                  Momentos
+                </small>
+              </div>
+
+            </div>
+
+            <blockquote>
+              As melhores lembranças não são
+              apenas fotos, são sentimentos
+              que a gente nunca quer esquecer.
+            </blockquote>
+
+          </section>
+
+        </aside>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- MODAL PARA ADICIONAR OU EDITAR MOMENTO -->
+
+  <div
+    class="moment-modal-overlay"
+    id="momentModal"
+  >
+
+    <div class="moment-modal">
+
+      <button
+        type="button"
+        class="close-moment-modal"
+        onclick="closeMomentModal()"
+      >
+        ×
+      </button>
+
+      <h2 id="momentModalTitle">
+        Adicionar momento ❤️
+      </h2>
+
+      <input
+        type="hidden"
+        id="editingMomentId"
+      >
+
+
+      <div class="moment-form-group">
+
+        <label for="momentMedia">
+          Foto ou vídeo
+        </label>
+
+        <input
+          type="file"
+          id="momentMedia"
+          accept="image/*,video/*"
+        >
+
+        <p
+          class="current-moment-media"
+          id="currentMomentMedia"
+        >
+        </p>
+
+      </div>
+
+
+      <div class="moment-form-group">
+
+        <label for="momentCaption">
+          Legenda do momento
+        </label>
+
+        <textarea
+          id="momentCaption"
+          maxlength="300"
+          placeholder="Escreva algo especial sobre esse momento..."
+        ></textarea>
+
+        <span class="moment-caption-counter">
+          <span id="momentCaptionCounter">
+            0
+          </span>/300
+        </span>
+
+      </div>
+
+
+      <div class="moment-form-group">
+
+        <label for="momentDate">
+          Data do momento
+        </label>
+
+        <input
+          type="date"
+          id="momentDate"
+        >
+
+        <p class="moment-form-help">
+          A data é opcional.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="save-moment-btn"
+        id="saveMomentBtn"
+        onclick="saveMoment()"
+      >
+        Salvar momento ❤️
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- VISUALIZADOR EM TELA CHEIA -->
+
+  <div
+    class="moment-viewer-overlay"
+    id="momentViewer"
+  >
+
+    <button
+      type="button"
+      class="close-moment-viewer"
+      onclick="closeMomentViewer()"
+    >
+      ×
+    </button>
+
+
+    <button
+      type="button"
+      class="viewer-navigation viewer-previous"
+      onclick="showPreviousMoment()"
+      aria-label="Momento anterior"
+    >
+      ‹
+    </button>
+
+
+    <div class="moment-viewer-content">
+
+      <div
+        class="viewer-media"
+        id="viewerMedia"
+      >
+      </div>
+
+      <div class="viewer-information">
+
+        <p id="viewerCaption">
+        </p>
+
+        <span id="viewerDate">
+        </span>
+
+        <div class="viewer-actions">
+
+          <button
+            type="button"
+            onclick="editViewedMoment()"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            class="viewer-delete-btn"
+            onclick="deleteViewedMoment()"
+          >
+            Excluir
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="viewer-navigation viewer-next"
+      onclick="showNextMoment()"
+      aria-label="Próximo momento"
+    >
+      ›
+    </button>
+
+  </div>
+
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+
+  <script
+    src="{{ url_for('static', filename='firebase.js') }}"
+  ></script>
+
+
+  <script
+    src="{{ url_for('static', filename='auth-guard.js') }}"
+    data-page-script="{{ url_for('static', filename='viagem-momentos.js') }}"
+  >
+  </script>
+
+</body>
+
+</html>

@@ -18,6 +18,18 @@ def home():
 def album():
     return render_template("album.html")
 
+@app.route("/viagens")
+def viagens():
+    return render_template("viagens.html")
+
+
+@app.route("/viagens/<trip_id>/momentos")
+def viagem_momentos(trip_id):
+    return render_template(
+        "viagens-momentos.html",
+        trip_id=trip_id
+    )
+
 @app.route("/config")
 def config():
     return render_template("config.html")

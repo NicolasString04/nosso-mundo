@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <script>
+    document.documentElement.style.visibility = "hidden";
+  </script>
+
+  <title>Traveling with my love ❤️</title>
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='viagens.css') }}"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+</head>
+
+<body>
+
+  <main class="travel-wrapper">
+
+    <aside class="sidebar">
+
+      <div class="logo-area">
+        <div class="logo-heart">♡</div>
+
+        <h2>Nosso Mundo</h2>
+
+        <p>só nosso</p>
+      </div>
+
+      <nav>
+        <a href="/home">
+          🏠 Início
+        </a>
+
+        <a href="/album">
+          🖼️ Álbum de Fotos
+        </a>
+
+        <a
+          class="active"
+          href="/viagens"
+        >
+          ✈️ Viagens
+        </a>
+
+        <a href="/config">
+          ⚙️ Configurações
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="logout-btn"
+        onclick="logout()"
+      >
+        Sair
+      </button>
+
+    </aside>
+
+
+    <section class="travel-content">
+
+      <header class="travel-header">
+
+        <div>
+          <h1>
+            Traveling with my love ❤️
+          </h1>
+
+          <p>
+            Destinos que sonhamos viver juntos.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="add-trip-btn"
+          onclick="openTripModal()"
+        >
+          ＋ Adicionar viagem
+        </button>
+
+      </header>
+
+
+      <section
+        class="trip-grid"
+        id="tripGrid"
+      >
+        <!-- Os cards serão carregados pelo JavaScript -->
+      </section>
+
+
+      <section
+        class="trip-details"
+        id="tripDetails"
+        hidden
+      >
+
+        <div class="trip-main-info">
+
+          <div
+            class="trip-cover-large"
+            id="selectedTripCover"
+          >
+          </div>
+
+          <div class="trip-summary">
+
+            <span
+              class="trip-status"
+              id="selectedTripStatus"
+            >
+              Planejada
+            </span>
+
+            <h2 id="selectedTripName">
+              Destino
+            </h2>
+
+            <p
+              class="trip-subtitle"
+              id="selectedTripSubtitle"
+            >
+            </p>
+
+            <div class="trip-meta">
+
+              <p>
+                <span>🗓️ Data prevista</span>
+
+                <strong id="selectedTripDate">
+                  A definir
+                </strong>
+              </p>
+
+              <p>
+                <span>📍 Destino</span>
+
+                <strong id="selectedTripLocation">
+                  A definir
+                </strong>
+              </p>
+
+            </div>
+
+            <div class="trip-quote">
+              “Cada esquina, um novo capítulo
+              da nossa história.”
+            </div>
+
+            <div class="trip-summary-actions">
+
+              <button
+                type="button"
+                class="secondary-btn"
+                onclick="editSelectedTrip()"
+              >
+                Editar viagem
+              </button>
+
+              <button
+                type="button"
+                class="danger-btn"
+                onclick="deleteSelectedTrip()"
+              >
+                Excluir
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="trip-notes-area">
+
+          <div class="detail-title">
+            ♡ Anotações da viagem
+          </div>
+
+          <div
+            class="trip-notes"
+            id="selectedTripNotes"
+          >
+            Nenhuma anotação adicionada.
+          </div>
+
+
+          <div class="detail-title moments-title">
+            ♡ Momentos para adicionar
+          </div>
+
+          <button
+            type="button"
+            class="future-moments-card"
+            onclick="openSelectedTripMoments()"
+          >
+            <span class="camera-icon">
+              📷
+            </span>
+
+            <span>
+              Adicionar fotos e vídeos<br>
+              que ainda vamos viver!
+            </span>
+          </button>
+
+        </div>
+
+
+        <div class="trip-media-area">
+
+          <div class="detail-title">
+            ♡ Fotos e vídeos
+          </div>
+
+          <div
+            class="moment-preview-grid"
+            id="momentPreviewGrid"
+          >
+            <div class="empty-moment">
+              ＋
+            </div>
+
+            <div class="empty-moment">
+              ＋
+            </div>
+
+            <div class="empty-moment">
+              ＋
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="view-moments-btn"
+            onclick="openSelectedTripMoments()"
+          >
+            🖼️ Ver todos os momentos
+          </button>
+
+
+          <div class="detail-title music-title">
+            ♡ Música da viagem
+          </div>
+
+          <div
+            class="trip-music"
+            id="selectedTripMusic"
+          >
+            <p>
+              Nenhuma música adicionada.
+            </p>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section
+        class="travel-empty-state"
+        id="travelEmptyState"
+        hidden
+      >
+        <span>✈️</span>
+
+        <h2>
+          Nossa próxima aventura começa aqui
+        </h2>
+
+        <p>
+          Adicione o primeiro destino que vocês
+          sonham conhecer juntos.
+        </p>
+
+        <button
+          type="button"
+          onclick="openTripModal()"
+        >
+          Adicionar primeira viagem
+        </button>
+      </section>
+
+    </section>
+
+  </main>
+
+
+  <div
+    class="trip-modal-overlay"
+    id="tripModal"
+  >
+
+    <div class="trip-modal">
+
+      <button
+        type="button"
+        class="close-trip-modal"
+        onclick="closeTripModal()"
+      >
+        ×
+      </button>
+
+      <h2 id="tripModalTitle">
+        Adicionar viagem ✈️
+      </h2>
+
+      <input
+        type="hidden"
+        id="editingTripId"
+      >
+
+
+      <div class="form-grid">
+
+        <div class="form-group form-group-full">
+          <label for="tripName">
+            Nome do destino
+          </label>
+
+          <input
+            type="text"
+            id="tripName"
+            placeholder="Ex.: Paris"
+            maxlength="80"
+          >
+        </div>
+
+
+        <div class="form-group">
+          <label for="tripCity">
+            Cidade
+          </label>
+
+          <input
+            type="text"
+            id="tripCity"
+            placeholder="Ex.: Paris"
+            maxlength="80"
+          >
+        </div>
+
+
+        <div class="form-group">
+          <label for="tripCountry">
+            País
+          </label>
+
+          <input
+            type="text"
+            id="tripCountry"
+            placeholder="Ex.: França"
+            maxlength="80"
+          >
+        </div>
+
+
+        <div class="form-group form-group-full">
+          <label for="tripSubtitle">
+            Frase do card
+          </label>
+
+          <input
+            type="text"
+            id="tripSubtitle"
+            placeholder="Ex.: Cidade do amor 💕"
+            maxlength="120"
+          >
+        </div>
+
+
+        <div class="form-group form-group-full">
+          <label for="tripStatus">
+            Situação da viagem
+          </label>
+
+          <select id="tripStatus">
+            <option value="wishlist">
+              Lista de desejos
+            </option>
+
+            <option value="planning">
+              Em planejamento
+            </option>
+
+            <option value="planned">
+              Planejada
+            </option>
+
+            <option value="completed">
+              Realizada
+            </option>
+          </select>
+        </div>
+
+
+        <div
+          class="trip-date-fields"
+          id="tripDateFields"
+          hidden
+        >
+
+          <div class="form-group">
+            <label for="tripStartDate">
+              Data inicial prevista
+            </label>
+
+            <input
+              type="date"
+              id="tripStartDate"
+            >
+          </div>
+
+
+          <div class="form-group">
+            <label for="tripEndDate">
+              Data final prevista
+            </label>
+
+            <input
+              type="date"
+              id="tripEndDate"
+            >
+          </div>
+
+        </div>
+
+
+        <div class="form-group form-group-full">
+          <label for="tripNotes">
+            Planos e anotações
+          </label>
+
+          <textarea
+            id="tripNotes"
+            placeholder="Passeios, restaurantes, ideias e tudo que vocês não podem esquecer..."
+            maxlength="1000"
+          ></textarea>
+
+          <span class="character-counter">
+            <span id="tripNotesCounter">0</span>/1000
+          </span>
+        </div>
+
+
+        <div class="form-group form-group-full">
+          <label for="tripMusic">
+            Música da viagem
+          </label>
+
+          <input
+            type="text"
+            id="tripMusic"
+            placeholder="Cole o link da música do Spotify"
+          >
+        </div>
+
+
+        <div class="form-group form-group-full">
+          <label for="tripCover">
+            Foto de capa
+          </label>
+
+          <input
+            type="file"
+            id="tripCover"
+            accept="image/*"
+          >
+
+          <p
+            class="current-cover-info"
+            id="currentCoverInfo"
+          >
+          </p>
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="save-trip-btn"
+        id="saveTripBtn"
+        onclick="saveTrip()"
+      >
+        Salvar viagem ❤️
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+  <script
+    src="{{ url_for('static', filename='firebase.js') }}"
+  ></script>
+
+  <script
+    src="{{ url_for('static', filename='auth-guard.js') }}"
+    data-page-script="{{ url_for('static', filename='viagens.js') }}"
+  >
+  </script>
+
+</body>
+
+</html>
