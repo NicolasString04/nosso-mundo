@@ -320,29 +320,50 @@ function timestampToMillis(timestamp) {
   return 0;
 }
 
-function compareMemoryOrder(first, second) {
-  const firstHasOrder =
-    Number.isFinite(first.order);
-
-  const secondHasOrder =
-    Number.isFinite(second.order);
-
-  if (firstHasOrder && secondHasOrder) {
-    return first.order - second.order;
-  }
-
-  if (firstHasOrder !== secondHasOrder) {
-    return firstHasOrder ? -1 : 1;
-  }
-
-  return (
-    timestampToMillis(first.createdAt) -
-    timestampToMillis(second.createdAt)
-  );
-}
-
 function sortAlbumMemories(memories) {
-  return [...memories].sort(compareMemoryOrder);
+  const hasManualOrder =
+    memories.some(
+      (memory) =>
+        Number.isFinite(memory.order) &&
+        memory.order < 1000000000
+    );
+
+  return [...memories].sort(
+    (first, second) => {
+      const firstHasOrder =
+        Number.isFinite(first.order);
+
+      const secondHasOrder =
+        Number.isFinite(second.order);
+
+      if (hasManualOrder) {
+        if (
+          firstHasOrder &&
+          secondHasOrder
+        ) {
+          return first.order - second.order;
+        }
+
+        if (
+          firstHasOrder !== secondHasOrder
+        ) {
+          return firstHasOrder ? -1 : 1;
+        }
+      }
+
+      const firstPosition =
+        firstHasOrder
+          ? first.order
+          : timestampToMillis(first.createdAt);
+
+      const secondPosition =
+        secondHasOrder
+          ? second.order
+          : timestampToMillis(second.createdAt);
+
+      return firstPosition - secondPosition;
+    }
+  );
 }
 
 function moveMemory(fromIndex, toIndex) {

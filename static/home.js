@@ -1899,6 +1899,12 @@ text:
           }
         );
 
+        /*
+ * Aplica na Home a ordem escolhida no Álbum.
+ */
+sortMemoriesBySavedOrder(
+  memories
+);
 
         /*
          * Depois de carregar.
