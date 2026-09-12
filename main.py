@@ -5,13 +5,11 @@ import os
 import smtplib
 import ssl
 
+from py_vapid import Vapid
 from pywebpush import WebPushException, webpush
 from cryptography.hazmat.primitives.serialization import (
     load_pem_public_key,
-    load_pem_private_key,
-    Encoding,
-    PrivateFormat,
-    NoEncryption
+    load_pem_private_key
 )
 
 from datetime import datetime, timezone
@@ -50,17 +48,8 @@ VAPID_CLAIMS_EMAIL = os.getenv(
 
 def get_webpush_vapid_private_key():
     """
-    Prepara a chave VAPID privada para o pywebpush.
-
-    Se estiver em PEM:
-    - corrige quebras de linha;
-    - valida com cryptography;
-    - normaliza para PKCS8;
-    - grava temporariamente em /tmp;
-    - retorna o caminho do arquivo.
-
-    Se já estiver em DER/Base64,
-    retorna o valor diretamente.
+    Carrega a chave privada VAPID e devolve
+    um objeto Vapid pronto para o pywebpush.
     """
 
     private_key = (
@@ -69,46 +58,41 @@ def get_webpush_vapid_private_key():
     ).strip()
 
     if not private_key:
-        return ""
+        raise RuntimeError(
+            "VAPID_PRIVATE_KEY não configurada."
+        )
 
-    # Caso a variável tenha sido salva
-    # com "\n" literal em vez de quebra real.
+    # Corrige caso a Vercel tenha armazenado
+    # \n literalmente.
     private_key = private_key.replace(
         "\\n",
         "\n"
     )
 
-    if "-----BEGIN" not in private_key:
-        return private_key
-
     try:
-        key_object = load_pem_private_key(
-            private_key.encode("utf-8"),
-            password=None
-        )
 
-        normalized_pem = key_object.private_bytes(
-            encoding=Encoding.PEM,
-            format=PrivateFormat.PKCS8,
-            encryption_algorithm=NoEncryption()
+        if "-----BEGIN" in private_key:
+
+            key_object = load_pem_private_key(
+                private_key.encode("utf-8"),
+                password=None
+            )
+
+            return Vapid(
+                key_object
+            )
+
+        # Caso algum dia a chave esteja
+        # armazenada no formato DER/Base64.
+        return Vapid.from_string(
+            private_key
         )
 
     except Exception as error:
+
         raise RuntimeError(
-            "VAPID_PRIVATE_KEY contém um PEM inválido."
+            "Não foi possível carregar a chave privada VAPID."
         ) from error
-
-    key_path = Path(
-        "/tmp/vapid_private_key.pem"
-    )
-
-    key_path.write_bytes(
-        normalized_pem
-    )
-
-    return str(
-        key_path
-    )
 
 # =========================================================
 # FIREBASE ADMIN
@@ -2074,14 +2058,18 @@ def enviar_notificacao_saudade():
     }, merge=True)
 
     try:
+
         webpush(
             subscription_info=subscription,
+
             data=json.dumps(
                 notification_payload,
                 ensure_ascii=False
             ),
+
             vapid_private_key=
             get_webpush_vapid_private_key(),
+
             vapid_claims={
                 "sub":
                     VAPID_CLAIMS_EMAIL
