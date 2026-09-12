@@ -42,6 +42,40 @@ VAPID_CLAIMS_EMAIL = os.getenv(
     "mailto:admin@nosso-mundo.local"
 )
 
+def get_webpush_vapid_private_key():
+    """
+    Converte a chave VAPID privada em PEM
+    para o formato Base64 DER esperado pelo pywebpush.
+    """
+
+    private_key = (
+        VAPID_PRIVATE_KEY
+        or ""
+    ).strip()
+
+    if not private_key:
+        return ""
+
+    if "BEGIN PRIVATE KEY" in private_key:
+
+        lines = (
+            private_key
+            .replace("\r", "")
+            .split("\n")
+        )
+
+        private_key = "".join(
+            line.strip()
+            for line in lines
+            if line.strip()
+            and
+            not line.startswith("-----BEGIN")
+            and
+            not line.startswith("-----END")
+        )
+
+    return private_key
+
 # =========================================================
 # FIREBASE ADMIN
 # =========================================================
@@ -2012,7 +2046,8 @@ def enviar_notificacao_saudade():
                 notification_payload,
                 ensure_ascii=False
             ),
-            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_private_key=
+            get_webpush_vapid_private_key(),
             vapid_claims={
                 "sub":
                     VAPID_CLAIMS_EMAIL
