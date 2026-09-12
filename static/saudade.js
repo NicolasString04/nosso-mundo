@@ -1920,27 +1920,11 @@ if (
 ) {
 
   /*
-   * 2. Garante que o aparelho atual
-   * está inscrito para notificações.
+   * O destinatário precisa ter ativado
+   * previamente as notificações no próprio
+   * aparelho.
    *
-   * Na prática, quem precisa ter aceitado
-   * é o destinatário. Esta chamada também
-   * ajuda a salvar/renovar a inscrição
-   * do usuário logado.
-   */
-
-  if (
-    typeof ensurePushSubscription ===
-    "function"
-  ) {
-
-    await ensurePushSubscription();
-
-  }
-
-
-  /*
-   * 3. Dispara a notificação real.
+   * Não tentamos inscrever o remetente aqui.
    */
 
   result =
