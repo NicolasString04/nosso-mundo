@@ -40,6 +40,12 @@ app = Flask(
 )
 
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+app.logger.warning(
+    "VAPID DEBUG | len=%s | begin=%s | end=%s",
+    len(VAPID_PRIVATE_KEY or ""),
+    "-----BEGIN" in (VAPID_PRIVATE_KEY or ""),
+    "-----END" in (VAPID_PRIVATE_KEY or "")
+)
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
 VAPID_CLAIMS_EMAIL = os.getenv(
     "VAPID_CLAIMS_EMAIL",
