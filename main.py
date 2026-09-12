@@ -2019,11 +2019,16 @@ def enviar_notificacao_saudade():
             }
         )
 
-    except WebPushException as error:
+
+    except Exception as error:
 
         status_code = None
 
-        if error.response is not None:
+        if (
+                isinstance(error, WebPushException)
+                and
+                error.response is not None
+        ):
             status_code = error.response.status_code
 
         if status_code in (404, 410):
