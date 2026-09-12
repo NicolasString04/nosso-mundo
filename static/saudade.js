@@ -26,6 +26,81 @@ const SAUDADE_CONFIG = {
   emailEnabled:
     true,
 
+  selectedChannel:
+    "email",
+
+  channels: {
+
+    email: {
+
+      label:
+        "E-mail",
+
+      icon:
+        "✉",
+
+      previewTitle:
+        "Prévia do e-mail",
+
+      previewCaption:
+        "Assim o carinho chega por e-mail.",
+
+      currentText:
+        "E-mail",
+
+      modalText:
+        "vai receber um carinho seu por e-mail. ❤️",
+
+      modalTitle:
+        "Alguém sentiu saudades de você ❤️",
+
+      successText:
+        "recebeu seu carinho por e-mail.",
+
+      emptyTitle:
+        "Nenhuma saudade por e-mail ainda.",
+
+      emptySubtitle:
+        "Quando você enviar por e-mail, aparece aqui."
+
+    },
+
+    phone: {
+
+      label:
+        "Celular",
+
+      icon:
+        "▯",
+
+      previewTitle:
+        "Prévia da notificação",
+
+      previewCaption:
+        "Assim o carinho aparece no celular.",
+
+      currentText:
+        "Celular",
+
+      modalText:
+        "vai ver essa saudade como notificação no celular. ❤️",
+
+      modalTitle:
+        "Tô com saudades 💕",
+
+      successText:
+        "ganhou uma saudade no histórico de celular.",
+
+      emptyTitle:
+        "Nenhuma saudade pelo celular ainda.",
+
+      emptySubtitle:
+        "As saudades desse canal vão aparecer aqui."
+
+    }
+
+  },
+
   cooldownMinutes:
     10,
 
@@ -53,6 +128,8 @@ let isSending = false;
 
 let contextLoaded = false;
 
+let historyDocuments = [];
+
 
 
 /* =========================================================
@@ -64,6 +141,44 @@ function getElement(id) {
   return document.getElementById(
     id
   );
+
+}
+
+
+
+/* =========================================================
+   CANAL SELECIONADO
+========================================================= */
+
+function getSelectedChannelConfig() {
+
+  return (
+    SAUDADE_CONFIG.channels[
+      SAUDADE_CONFIG
+        .selectedChannel
+    ]
+    ||
+    SAUDADE_CONFIG
+      .channels
+      .email
+  );
+
+}
+
+
+
+function normalizeChannel(channel) {
+
+  if (
+    channel === "phone"
+  ) {
+
+    return "phone";
+
+  }
+
+
+  return "email";
 
 }
 
@@ -352,6 +467,187 @@ function updatePeopleUI() {
 
   updateModalPeople();
 
+  updateChannelUI();
+
+}
+
+
+
+/* =========================================================
+   ATUALIZAR CANAL NA TELA
+========================================================= */
+
+function updateChannelUI() {
+
+  const channel =
+    getSelectedChannelConfig();
+
+
+  document
+    .querySelectorAll(
+      ".channel-option"
+    )
+    .forEach(
+      (button) => {
+
+        const isActive =
+          button.dataset.channel ===
+          SAUDADE_CONFIG
+            .selectedChannel;
+
+
+        button.classList.toggle(
+          "active",
+          isActive
+        );
+
+
+        button.setAttribute(
+          "aria-pressed",
+          String(isActive)
+        );
+
+      }
+    );
+
+
+  const currentChannel =
+    getElement(
+      "currentChannelName"
+    );
+
+
+  if (currentChannel) {
+
+    currentChannel.textContent =
+      channel.currentText;
+
+  }
+
+
+  const previewIcon =
+    getElement(
+      "previewChannelIcon"
+    );
+
+
+  const previewTitle =
+    getElement(
+      "previewChannelTitle"
+    );
+
+
+  const previewCaption =
+    getElement(
+      "previewChannelCaption"
+    );
+
+
+  if (previewIcon) {
+
+    previewIcon.textContent =
+      channel.icon;
+
+  }
+
+
+  if (previewTitle) {
+
+    previewTitle.textContent =
+      channel.previewTitle;
+
+  }
+
+
+  if (previewCaption) {
+
+    previewCaption.textContent =
+      channel.previewCaption;
+
+  }
+
+
+  const emailPreview =
+    getElement(
+      "emailPreviewPanel"
+    );
+
+
+  const phonePreview =
+    getElement(
+      "phonePreviewPanel"
+    );
+
+
+  if (emailPreview) {
+
+    emailPreview.hidden =
+      SAUDADE_CONFIG
+        .selectedChannel !== "email";
+
+  }
+
+
+  if (phonePreview) {
+
+    phonePreview.hidden =
+      SAUDADE_CONFIG
+        .selectedChannel !== "phone";
+
+  }
+
+
+  const historyTitle =
+    document.querySelector(
+      ".history-card .side-card-title h2"
+    );
+
+
+  if (historyTitle) {
+
+    historyTitle.textContent =
+      SAUDADE_CONFIG.selectedChannel === "email"
+        ? "Últimas saudades por e-mail"
+        : "Últimas saudades pelo celular";
+
+  }
+
+
+  updateModalPeople();
+
+  updatePreviewTime();
+
+  renderHistory();
+
+}
+
+
+
+function setSaudadeChannel(channel) {
+
+  const normalizedChannel =
+    normalizeChannel(channel);
+
+
+  if (
+    normalizedChannel ===
+    SAUDADE_CONFIG
+      .selectedChannel
+  ) {
+
+    return;
+
+  }
+
+
+  SAUDADE_CONFIG.selectedChannel =
+    normalizedChannel;
+
+
+  updateChannelUI();
+
+  updateCooldownUI();
+
 }
 
 
@@ -362,6 +658,10 @@ function updatePeopleUI() {
 
 function updateModalPeople() {
 
+  const channel =
+    getSelectedChannelConfig();
+
+
   const modalPreview =
     document.querySelector(
       ".modal-preview small"
@@ -371,6 +671,12 @@ function updateModalPeople() {
   const modalDescription =
     document.querySelector(
       ".saudade-modal > p"
+    );
+
+
+  const modalTitle =
+    document.querySelector(
+      ".modal-preview strong"
     );
 
 
@@ -392,7 +698,15 @@ function updateModalPeople() {
   ) {
 
     modalDescription.textContent =
-      `${SAUDADE_CONFIG.recipientName} vai receber um carinho seu por e-mail. ❤️`;
+      `${SAUDADE_CONFIG.recipientName} ${channel.modalText}`;
+
+  }
+
+
+  if (modalTitle) {
+
+    modalTitle.textContent =
+      channel.modalTitle;
 
   }
 
@@ -426,6 +740,12 @@ function updatePreviewTime() {
     );
 
 
+  const phonePreview =
+    getElement(
+      "phonePreviewTime"
+    );
+
+
   if (preview) {
 
     preview.textContent =
@@ -438,6 +758,14 @@ function updatePreviewTime() {
 
     confirmation.textContent =
       `às ${time}`;
+
+  }
+
+
+  if (phonePreview) {
+
+    phonePreview.textContent =
+      time;
 
   }
 
@@ -653,6 +981,17 @@ function timestampToDate(
    ITEM DO HISTÓRICO
 ========================================================= */
 
+function getSaudadeChannel(data) {
+
+  return normalizeChannel(
+    data.channel ||
+    "email"
+  );
+
+}
+
+
+
 function createHistoryItem(
   data
 ) {
@@ -748,9 +1087,7 @@ function createHistoryItem(
    HISTÓRICO
 ========================================================= */
 
-function renderHistory(
-  snapshot
-) {
+function renderHistory() {
 
   const history =
     getElement(
@@ -782,7 +1119,35 @@ function renderHistory(
     "";
 
 
-  if (snapshot.empty) {
+  const selectedChannel =
+    SAUDADE_CONFIG
+      .selectedChannel;
+
+
+  const channel =
+    getSelectedChannelConfig();
+
+
+  const filteredDocuments =
+    historyDocuments
+      .filter(
+        (doc) => {
+
+          return (
+            getSaudadeChannel(
+              doc.data()
+            )
+            ===
+            selectedChannel
+          );
+
+        }
+      );
+
+
+  if (
+    filteredDocuments.length === 0
+  ) {
 
     history.innerHTML = `
       <div class="history-empty">
@@ -790,11 +1155,11 @@ function renderHistory(
         <span>♡</span>
 
         <p>
-          Nenhuma saudade enviada ainda.
+          ${channel.emptyTitle}
         </p>
 
         <small>
-          O primeiro carinho vai aparecer aqui.
+          ${channel.emptySubtitle}
         </small>
 
       </div>
@@ -826,7 +1191,7 @@ function renderHistory(
    * os primeiros registros.
    */
 
-  snapshot.docs
+  filteredDocuments
     .slice(
       0,
       SAUDADE_CONFIG
@@ -851,7 +1216,7 @@ function renderHistory(
    */
 
   const currentUserDocument =
-    snapshot.docs.find(
+    filteredDocuments.find(
       (doc) => {
 
         const data =
@@ -896,7 +1261,7 @@ function renderHistory(
   if (viewAll) {
 
     viewAll.hidden =
-      snapshot.size <=
+      filteredDocuments.length <=
       SAUDADE_CONFIG
         .historyLimit;
 
@@ -932,9 +1297,11 @@ function loadSaudadeHistory() {
 
       (snapshot) => {
 
-        renderHistory(
-          snapshot
-        );
+        historyDocuments =
+          snapshot.docs;
+
+
+        renderHistory();
 
       },
 
@@ -1188,6 +1555,11 @@ async function saveSaudadeEvent() {
     new Date();
 
 
+  const selectedChannel =
+    SAUDADE_CONFIG
+      .selectedChannel;
+
+
   const reference =
     await db
       .collection(
@@ -1211,7 +1583,7 @@ async function saveSaudadeEvent() {
           user.uid,
 
         channel:
-          "email",
+          selectedChannel,
 
         createdAt:
           firebase
@@ -1223,7 +1595,14 @@ async function saveSaudadeEvent() {
           now.toISOString(),
 
         emailStatus:
-          "pending",
+          selectedChannel === "email"
+            ? "pending"
+            : "not_applicable",
+
+        notificationStatus:
+          selectedChannel === "phone"
+            ? "preview_ready"
+            : "not_applicable",
 
         opened:
           false
@@ -1345,7 +1724,91 @@ async function requestRealEmail(
 
 }
 
+/* =========================================================
+   PEDIR ENVIO DE NOTIFICAÇÃO AO BACKEND
+========================================================= */
 
+async function requestRealNotification(
+  saudadeId
+) {
+
+  const user =
+    auth.currentUser;
+
+
+  if (!user) {
+
+    throw new Error(
+      "Usuário não autenticado."
+    );
+
+  }
+
+
+  const idToken =
+    await user.getIdToken();
+
+
+  const response =
+    await fetch(
+      "/api/saudade/enviar-notificacao",
+      {
+
+        method:
+          "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              `Bearer ${idToken}`
+
+          },
+
+          body:
+            JSON.stringify({
+
+              saudadeId:
+                saudadeId
+
+            })
+
+        }
+      );
+
+
+  let data = {};
+
+
+  try {
+
+    data =
+      await response.json();
+
+  }
+
+  catch (_) {
+
+    data = {};
+
+  }
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      "Não foi possível enviar a notificação."
+    );
+
+  }
+
+
+  return data;
+
+}
 
 /* =========================================================
    ENVIAR SAUDADE
@@ -1414,6 +1877,11 @@ async function sendSaudade() {
 
   try {
 
+    const selectedChannel =
+      SAUDADE_CONFIG
+        .selectedChannel;
+
+
     /*
      * 1. Registra o evento.
      */
@@ -1422,22 +1890,65 @@ async function sendSaudade() {
       await saveSaudadeEvent();
 
 
-    /*
-     * 2. Dispara o backend seguro.
-     */
+    let result = {
 
-    const result =
-      await requestRealEmail(
-        event.id
-      );
+      to:
+        SAUDADE_CONFIG
+          .recipientName
+
+    };
 
 
-    /*
-     * O backend é responsável por marcar
-     * emailStatus = sent.
-     *
-     * Não repetimos essa escrita no frontend.
-     */
+    if (
+  selectedChannel === "email"
+) {
+
+  /*
+   * 2. Dispara o backend seguro.
+   */
+
+  result =
+    await requestRealEmail(
+      event.id
+    );
+
+}
+
+
+if (
+  selectedChannel === "phone"
+) {
+
+  /*
+   * 2. Garante que o aparelho atual
+   * está inscrito para notificações.
+   *
+   * Na prática, quem precisa ter aceitado
+   * é o destinatário. Esta chamada também
+   * ajuda a salvar/renovar a inscrição
+   * do usuário logado.
+   */
+
+  if (
+    typeof ensurePushSubscription ===
+    "function"
+  ) {
+
+    await ensurePushSubscription();
+
+  }
+
+
+  /*
+   * 3. Dispara a notificação real.
+   */
+
+  result =
+    await requestRealNotification(
+      event.id
+    );
+
+}
 
 
     lastSentAt =
@@ -1455,7 +1966,7 @@ async function sendSaudade() {
 
     showToast(
       "Saudade enviada! ❤️",
-      `${result.to || SAUDADE_CONFIG.recipientName} recebeu seu carinho por e-mail.`
+      `${result.to || SAUDADE_CONFIG.recipientName} ${getSelectedChannelConfig().successText}`
     );
 
   }
@@ -1468,11 +1979,6 @@ async function sendSaudade() {
       error
     );
 
-
-    /*
-     * Se o backend retornou rate limit,
-     * podemos respeitar também na interface.
-     */
 
     if (
       error.retryAfterSeconds
@@ -1703,7 +2209,93 @@ document
     }
   );
 
+/* =========================================================
+   ATIVAR NOTIFICAÇÕES NO CELULAR
+========================================================= */
 
+async function enablePhoneNotifications() {
+
+  if (
+    typeof subscribeToPushNotifications !==
+    "function"
+  ) {
+
+    showToast(
+      "Ops...",
+      "As notificações ainda não foram carregadas."
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.querySelector(
+      ".enable-notifications-btn"
+    );
+
+
+  try {
+
+    if (button) {
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        "Ativando notificações...";
+
+    }
+
+
+    await subscribeToPushNotifications();
+
+
+    showToast(
+      "Notificações ativadas ❤️",
+      "Este celular já pode receber saudades."
+    );
+
+
+    if (button) {
+
+      button.textContent =
+        "Notificações ativadas neste celular";
+
+    }
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "Erro ao ativar notificações:",
+      error
+    );
+
+
+    showToast(
+      "Não foi possível ativar 💔",
+      error.message ||
+      "Confira a permissão de notificações do navegador."
+    );
+
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "Ativar notificações neste celular";
+
+    }
+
+  }
+
+}
 
 /* =========================================================
    INICIALIZAÇÃO
@@ -1715,26 +2307,14 @@ async function initializeSaudadePage() {
 
   updatePreviewTime();
 
+  updateChannelUI();
+
   applySavedBackground();
 
 
   try {
 
-    /*
-     * Backend decide:
-     *
-     * Nicolas -> Sofia
-     * ou
-     * Sofia -> Nicolas
-     */
-
     await loadSaudadeContext();
-
-
-    /*
-     * Agora que sabemos quem está logado,
-     * podemos liberar interface/histórico.
-     */
 
     loadSaudadeHistory();
 

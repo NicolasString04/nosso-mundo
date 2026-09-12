@@ -1,3 +1,4 @@
 Flask
 python-dotenv
 firebase-admin
+pywebpush==2.0.0

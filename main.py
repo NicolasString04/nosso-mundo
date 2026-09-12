@@ -1,8 +1,12 @@
+import base64
 import html
 import json
 import os
 import smtplib
 import ssl
+
+from pywebpush import WebPushException, webpush
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -31,6 +35,12 @@ app = Flask(
     template_folder="pages"
 )
 
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
+VAPID_CLAIMS_EMAIL = os.getenv(
+    "VAPID_CLAIMS_EMAIL",
+    "mailto:admin@nosso-mundo.local"
+)
 
 # =========================================================
 # FIREBASE ADMIN
@@ -1090,14 +1100,10 @@ def build_saudade_email(
         recipient_email
     )
 
-    # Se a pessoa responder ao e-mail,
-    # a resposta vai diretamente para quem
-    # realmente clicou em "Tô com saudades".
     message["Reply-To"] = (
         sender_person["email"]
     )
 
-    # Versão em texto puro
     message.set_content(
         "\n".join([
 
@@ -1323,10 +1329,6 @@ def contexto_saudade():
 )
 def enviar_email_saudade():
 
-    # =====================================================
-    # 1. AUTENTICAÇÃO
-    # =====================================================
-
     decoded_token, auth_error = (
         authenticate_request()
     )
@@ -1335,11 +1337,6 @@ def enviar_email_saudade():
         return auth_error
 
     uid = decoded_token["uid"]
-
-
-    # =====================================================
-    # 2. IDENTIFICAR QUEM ENVIA / RECEBE
-    # =====================================================
 
     try:
 
@@ -1365,7 +1362,6 @@ def enviar_email_saudade():
                 "Configuração do Cantinho da Saudade incompleta."
         }), 503
 
-
     sender_person = (
         context["sender"]
     )
@@ -1374,18 +1370,12 @@ def enviar_email_saudade():
         context["recipient"]
     )
 
-
-    # =====================================================
-    # 3. JSON
-    # =====================================================
-
     if not request.is_json:
 
         return jsonify({
             "error":
                 "Requisição inválida."
         }), 400
-
 
     payload = (
         request.get_json(
@@ -1394,7 +1384,6 @@ def enviar_email_saudade():
         or {}
     )
 
-
     saudade_id = str(
         payload.get(
             "saudadeId",
@@ -1402,18 +1391,12 @@ def enviar_email_saudade():
         )
     ).strip()
 
-
     if not saudade_id:
 
         return jsonify({
             "error":
                 "Saudade não informada."
         }), 400
-
-
-    # =====================================================
-    # 4. BUSCAR SAUDADE NO FIRESTORE
-    # =====================================================
 
     saudade_ref = (
         admin_db
@@ -1425,11 +1408,9 @@ def enviar_email_saudade():
         )
     )
 
-
     saudade_snapshot = (
         saudade_ref.get()
     )
-
 
     if not saudade_snapshot.exists:
 
@@ -1438,16 +1419,10 @@ def enviar_email_saudade():
                 "Saudade não encontrada."
         }), 404
 
-
     saudade_data = (
         saudade_snapshot
         .to_dict()
     )
-
-
-    # =====================================================
-    # 5. VALIDAR AUTOR DO DOCUMENTO
-    # =====================================================
 
     if (
         saudade_data.get(
@@ -1461,17 +1436,11 @@ def enviar_email_saudade():
                 "Você não pode enviar esta saudade."
         }), 403
 
-
-    # =====================================================
-    # 6. EVITAR ENVIO DUPLICADO
-    # =====================================================
-
     current_status = (
         saudade_data.get(
             "emailStatus"
         )
     )
-
 
     if current_status == "sent":
 
@@ -1480,18 +1449,12 @@ def enviar_email_saudade():
                 "Esta saudade já foi enviada."
         }), 409
 
-
     if current_status == "sending":
 
         return jsonify({
             "error":
                 "Esta saudade já está sendo enviada."
         }), 409
-
-
-    # =====================================================
-    # 7. RATE LIMIT NO BACKEND
-    # =====================================================
 
     try:
 
@@ -1511,11 +1474,6 @@ def enviar_email_saudade():
 
         }), 429
 
-
-    # =====================================================
-    # 8. CONFIGURAÇÃO DO GMAIL
-    # =====================================================
-
     try:
 
         email_config = (
@@ -1533,11 +1491,6 @@ def enviar_email_saudade():
                 "O envio de e-mail não está configurado."
         }), 503
 
-
-    # =====================================================
-    # 9. URL DO NOSSO MUNDO
-    # =====================================================
-
     base_url = (
         os.getenv(
             "SAUDADE_BASE_URL",
@@ -1547,7 +1500,6 @@ def enviar_email_saudade():
         .rstrip("/")
     )
 
-
     if not base_url:
 
         base_url = (
@@ -1555,15 +1507,9 @@ def enviar_email_saudade():
             .rstrip("/")
         )
 
-
     saudade_url = (
         f"{base_url}/saudade"
     )
-
-
-    # =====================================================
-    # 10. MARCAR COMO "ENVIANDO"
-    # =====================================================
 
     saudade_ref.update({
 
@@ -1580,11 +1526,6 @@ def enviar_email_saudade():
             recipient_person["name"]
 
     })
-
-
-    # =====================================================
-    # 11. CRIAR E ENVIAR E-MAIL
-    # =====================================================
 
     try:
 
@@ -1606,7 +1547,6 @@ def enviar_email_saudade():
             )
         )
 
-
         send_email_via_gmail(
 
             message=
@@ -1619,11 +1559,6 @@ def enviar_email_saudade():
                 email_config["password"]
 
         )
-
-
-        # =================================================
-        # 12. SUCESSO
-        # =================================================
 
         saudade_ref.update({
 
@@ -1641,7 +1576,6 @@ def enviar_email_saudade():
 
         })
 
-
         return jsonify({
 
             "success":
@@ -1658,17 +1592,11 @@ def enviar_email_saudade():
 
         }), 200
 
-
-    # =====================================================
-    # ERRO DE ENVIO
-    # =====================================================
-
     except Exception:
 
         app.logger.exception(
             "Erro ao enviar e-mail de saudade."
         )
-
 
         try:
 
@@ -1688,11 +1616,478 @@ def enviar_email_saudade():
                 "Erro ao atualizar status da saudade."
             )
 
-
         return jsonify({
             "error":
                 "Não foi possível enviar o e-mail."
         }), 500
+
+
+# =========================================================
+# API - PUSH NOTIFICATIONS
+# =========================================================
+
+def get_browser_vapid_public_key():
+    """
+    O navegador não usa a chave PEM diretamente.
+    Ele precisa da chave pública VAPID em formato
+    base64url, com o ponto EC não comprimido.
+
+    Se VAPID_PUBLIC_KEY já estiver nesse formato,
+    retornamos como está.
+    """
+
+    public_key = (
+        VAPID_PUBLIC_KEY
+        or ""
+    ).strip()
+
+    if not public_key:
+        return ""
+
+    if "BEGIN PUBLIC KEY" not in public_key:
+        return public_key
+
+    loaded_public_key = load_pem_public_key(
+        public_key.encode("utf-8")
+    )
+
+    numbers = loaded_public_key.public_numbers()
+
+    raw_key = (
+        b"\x04"
+        +
+        numbers.x.to_bytes(32, "big")
+        +
+        numbers.y.to_bytes(32, "big")
+    )
+
+    return (
+        base64
+        .urlsafe_b64encode(raw_key)
+        .decode("utf-8")
+        .rstrip("=")
+    )
+
+
+@app.route(
+    "/api/push/public-key",
+    methods=["GET"]
+)
+def get_push_public_key():
+
+    try:
+        public_key = get_browser_vapid_public_key()
+
+    except Exception:
+        app.logger.exception(
+            "Erro ao preparar chave pública VAPID."
+        )
+
+        return jsonify({
+            "error":
+                "Chave pública VAPID inválida."
+        }), 500
+
+    if not public_key:
+        return jsonify({
+            "error":
+                "Chave pública VAPID não configurada."
+        }), 500
+
+    return jsonify({
+        "publicKey":
+            public_key
+    }), 200
+
+
+@app.route(
+    "/api/push/subscribe",
+    methods=["POST"]
+)
+def subscribe_push_notifications():
+
+    decoded_token, auth_error = (
+        authenticate_request()
+    )
+
+    if auth_error:
+        return auth_error
+
+    uid = decoded_token["uid"]
+
+    payload = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
+
+    subscription = payload.get(
+        "subscription"
+    )
+
+    if not subscription:
+        return jsonify({
+            "error":
+                "Inscrição de push não enviada."
+        }), 400
+
+    if not isinstance(subscription, dict):
+        return jsonify({
+            "error":
+                "Inscrição de push inválida."
+        }), 400
+
+    endpoint = subscription.get(
+        "endpoint"
+    )
+
+    keys = subscription.get(
+        "keys"
+    ) or {}
+
+    if (
+        not endpoint
+        or
+        not keys.get("p256dh")
+        or
+        not keys.get("auth")
+    ):
+        return jsonify({
+            "error":
+                "Inscrição de push incompleta."
+        }), 400
+
+    try:
+        context = get_saudade_context(
+            uid
+        )
+
+    except PermissionError:
+        return jsonify({
+            "error":
+                "Usuário não autorizado."
+        }), 403
+
+    except RuntimeError:
+        app.logger.exception(
+            "Configuração do Cantinho da Saudade inválida."
+        )
+
+        return jsonify({
+            "error":
+                "Configuração do sistema incompleta."
+        }), 503
+
+    admin_db.collection(
+        "pushSubscriptions"
+    ).document(
+        uid
+    ).set({
+
+        "uid":
+            uid,
+
+        "name":
+            context["sender"]["name"],
+
+        "subscription":
+            subscription,
+
+        "updatedAt":
+            firestore.SERVER_TIMESTAMP
+
+    }, merge=True)
+
+    return jsonify({
+        "success":
+            True
+    }), 200
+
+
+@app.route(
+    "/api/saudade/enviar-notificacao",
+    methods=["POST"]
+)
+def enviar_notificacao_saudade():
+
+    if not VAPID_PRIVATE_KEY:
+        return jsonify({
+            "error":
+                "Chave privada VAPID não configurada."
+        }), 500
+
+    decoded_token, auth_error = (
+        authenticate_request()
+    )
+
+    if auth_error:
+        return auth_error
+
+    uid = decoded_token["uid"]
+
+    try:
+        context = get_saudade_context(
+            uid
+        )
+
+    except PermissionError:
+        return jsonify({
+            "error":
+                "Usuário não autorizado."
+        }), 403
+
+    except RuntimeError:
+        app.logger.exception(
+            "Configuração de usuários inválida."
+        )
+
+        return jsonify({
+            "error":
+                "Configuração do Cantinho da Saudade incompleta."
+        }), 503
+
+    sender_person = context["sender"]
+    recipient_person = context["recipient"]
+
+    payload = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
+
+    saudade_id = str(
+        payload.get(
+            "saudadeId",
+            ""
+        )
+    ).strip()
+
+    if not saudade_id:
+        return jsonify({
+            "error":
+                "Saudade não informada."
+        }), 400
+
+    saudade_ref = (
+        admin_db
+        .collection(
+            "saudades"
+        )
+        .document(
+            saudade_id
+        )
+    )
+
+    saudade_snapshot = saudade_ref.get()
+
+    if not saudade_snapshot.exists:
+        return jsonify({
+            "error":
+                "Saudade não encontrada."
+        }), 404
+
+    saudade_data = (
+        saudade_snapshot
+        .to_dict()
+        or {}
+    )
+
+    if saudade_data.get("fromUid") != uid:
+        return jsonify({
+            "error":
+                "Você não pode enviar esta notificação."
+        }), 403
+
+    current_status = saudade_data.get(
+        "notificationStatus"
+    )
+
+    if current_status == "sent":
+        return jsonify({
+            "error":
+                "Esta notificação já foi enviada."
+        }), 409
+
+    recipient_uid = recipient_person.get(
+        "uid"
+    )
+
+    if not recipient_uid:
+        return jsonify({
+            "error":
+                "Destinatário não encontrado."
+        }), 400
+
+    subscription_snapshot = (
+        admin_db
+        .collection(
+            "pushSubscriptions"
+        )
+        .document(
+            recipient_uid
+        )
+        .get()
+    )
+
+    if not subscription_snapshot.exists:
+
+        saudade_ref.set({
+            "notificationStatus":
+                "no_subscription",
+
+            "notificationUpdatedAt":
+                firestore.SERVER_TIMESTAMP
+        }, merge=True)
+
+        return jsonify({
+            "error":
+                f"{recipient_person['name']} ainda não ativou notificações no celular."
+        }), 404
+
+    subscription_data = (
+        subscription_snapshot
+        .to_dict()
+        or {}
+    )
+
+    subscription = subscription_data.get(
+        "subscription"
+    )
+
+    if not subscription:
+        return jsonify({
+            "error":
+                "Inscrição de notificação inválida."
+        }), 400
+
+    base_url = (
+        os.getenv(
+            "SAUDADE_BASE_URL",
+            ""
+        )
+        .strip()
+        .rstrip("/")
+    )
+
+    if not base_url:
+        base_url = (
+            request.host_url
+            .rstrip("/")
+        )
+
+    notification_payload = {
+        "title":
+            "Tô com saudades de você ❤️",
+
+        "body":
+            f"{sender_person['name']} mandou uma saudade no Nosso Mundo.",
+
+        "url":
+            f"{base_url}/saudade",
+
+        "tag":
+            f"saudade-{saudade_id}"
+    }
+
+    saudade_ref.set({
+        "notificationStatus":
+            "sending",
+
+        "notificationAttemptAt":
+            firestore.SERVER_TIMESTAMP,
+
+        "resolvedSenderName":
+            sender_person["name"],
+
+        "resolvedRecipientName":
+            recipient_person["name"]
+    }, merge=True)
+
+    try:
+        webpush(
+            subscription_info=subscription,
+            data=json.dumps(
+                notification_payload,
+                ensure_ascii=False
+            ),
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims={
+                "sub":
+                    VAPID_CLAIMS_EMAIL
+            }
+        )
+
+    except WebPushException as error:
+
+        status_code = None
+
+        if error.response is not None:
+            status_code = error.response.status_code
+
+        if status_code in (404, 410):
+            admin_db.collection(
+                "pushSubscriptions"
+            ).document(
+                recipient_uid
+            ).delete()
+
+            notification_status = "expired_subscription"
+
+        else:
+            notification_status = "failed"
+
+        saudade_ref.set({
+            "notificationStatus":
+                notification_status,
+
+            "notificationError":
+                str(error),
+
+            "notificationUpdatedAt":
+                firestore.SERVER_TIMESTAMP
+        }, merge=True)
+
+        app.logger.exception(
+            "Erro ao enviar push de saudade."
+        )
+
+        return jsonify({
+            "error":
+                "Não foi possível enviar a notificação."
+        }), 500
+
+    saudade_ref.set({
+        "notificationStatus":
+            "sent",
+
+        "notificationSentAt":
+            firestore.SERVER_TIMESTAMP,
+
+        "notificationUpdatedAt":
+            firestore.SERVER_TIMESTAMP,
+
+        "fromName":
+            sender_person["name"],
+
+        "toName":
+            recipient_person["name"]
+    }, merge=True)
+
+    return jsonify({
+        "success":
+            True,
+
+        "message":
+            "Notificação enviada com sucesso.",
+
+        "from":
+            sender_person["name"],
+
+        "to":
+            recipient_person["name"]
+    }), 200
 
 
 # =========================================================
