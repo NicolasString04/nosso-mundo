@@ -6,7 +6,13 @@ import smtplib
 import ssl
 
 from pywebpush import WebPushException, webpush
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
+from cryptography.hazmat.primitives.serialization import (
+    load_pem_public_key,
+    load_pem_private_key,
+    Encoding,
+    PrivateFormat,
+    NoEncryption
+)
 
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -44,8 +50,17 @@ VAPID_CLAIMS_EMAIL = os.getenv(
 
 def get_webpush_vapid_private_key():
     """
-    Converte a chave VAPID privada em PEM
-    para o formato Base64 DER esperado pelo pywebpush.
+    Prepara a chave VAPID privada para o pywebpush.
+
+    Se estiver em PEM:
+    - corrige quebras de linha;
+    - valida com cryptography;
+    - normaliza para PKCS8;
+    - grava temporariamente em /tmp;
+    - retorna o caminho do arquivo.
+
+    Se já estiver em DER/Base64,
+    retorna o valor diretamente.
     """
 
     private_key = (
@@ -56,25 +71,44 @@ def get_webpush_vapid_private_key():
     if not private_key:
         return ""
 
-    if "BEGIN PRIVATE KEY" in private_key:
+    # Caso a variável tenha sido salva
+    # com "\n" literal em vez de quebra real.
+    private_key = private_key.replace(
+        "\\n",
+        "\n"
+    )
 
-        lines = (
-            private_key
-            .replace("\r", "")
-            .split("\n")
+    if "-----BEGIN" not in private_key:
+        return private_key
+
+    try:
+        key_object = load_pem_private_key(
+            private_key.encode("utf-8"),
+            password=None
         )
 
-        private_key = "".join(
-            line.strip()
-            for line in lines
-            if line.strip()
-            and
-            not line.startswith("-----BEGIN")
-            and
-            not line.startswith("-----END")
+        normalized_pem = key_object.private_bytes(
+            encoding=Encoding.PEM,
+            format=PrivateFormat.PKCS8,
+            encryption_algorithm=NoEncryption()
         )
 
-    return private_key
+    except Exception as error:
+        raise RuntimeError(
+            "VAPID_PRIVATE_KEY contém um PEM inválido."
+        ) from error
+
+    key_path = Path(
+        "/tmp/vapid_private_key.pem"
+    )
+
+    key_path.write_bytes(
+        normalized_pem
+    )
+
+    return str(
+        key_path
+    )
 
 # =========================================================
 # FIREBASE ADMIN
